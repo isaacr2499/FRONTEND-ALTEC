@@ -1,38 +1,21 @@
 <app-loader></app-loader>
 
-<!-- 🛒 HERO SECTION DEL CARRITO -->
-<div class="cart-hero">
-  <div class="container position-relative py-4">
-    <div class="row align-items-center">
-      <div class="col-12 col-md-6">
-        <button type="button" class="btn btn-outline-light d-inline-flex align-items-center gap-2 mb-3 mb-md-0" (click)="goBackToStore()">
-          <i class="bi bi-arrow-left"></i>
-          <span>Seguir comprando</span>
-        </button>
-      </div>
-      <div class="col-12 col-md-6 text-md-end">
-        <div class="cart-summary-badge">
-          <i class="bi bi-cart-fill me-2"></i>
-          <span class="fw-bold me-2">{{ cart.length }}</span>productos en tu carrito
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- 🎨 CONTENEDOR PRINCIPAL -->
 <div class="cart-container">
   <div class="container py-5">
 
     <!-- Header del carrito -->
     <div class="cart-header text-center mb-5">
-      <h1 class="display-5 fw-bold text-white mb-3">
-        <i class="bi bi-bag-check-fill text-primary me-3"></i>
-        Tu Carrito de Compras
-      </h1>
-      <p class="lead text-white-50">
-        Revisa y confirma los productos antes de finalizar tu compra
-      </p>
+      <div class="cart-header-row">
+        <button type="button" class="btn btn-back d-inline-flex align-items-center gap-2" (click)="goBackToStore()">
+          <i class="bi bi-arrow-left"></i>
+          <span>Seguir comprando</span>
+        </button>
+        <h1 class="display-5 fw-bold text-white mb-0">
+          <i class="bi bi-bag-check-fill text-primary me-3"></i>
+          Tus Compras
+        </h1>
+      </div>
     </div>
 
     <!-- Contenido del carrito -->
@@ -132,12 +115,6 @@
                 <span class="text-white-50">Productos ({{ cart.length }})</span>
                 <span class="text-white fw-semibold">{{ total | currency: 'USD' }}</span>
               </div>
-              <div class="summary-row">
-                <span class="text-white-50">Envío</span>
-                <span class="text-success fw-semibold">Gratis</span>
-              </div>
-
-              <hr class="summary-divider">
 
               <div class="summary-row summary-total">
                 <span class="text-white fw-bold">Total</span>
@@ -154,21 +131,16 @@
               <span>Finalizar compra</span>
             </button>
 
-            <!-- Info adicional -->
-            <div class="summary-info mt-4">
-              <div class="info-item">
-                <i class="bi bi-shield-check text-success"></i>
-                <span class="text-white-50 small">Compra 100% segura</span>
-              </div>
-              <div class="info-item">
-                <i class="bi bi-truck text-primary"></i>
-                <span class="text-white-50 small">Envío rápido 24-48h</span>
-              </div>
-              <div class="info-item">
-                <i class="bi bi-arrow-return-left text-info"></i>
-                <span class="text-white-50 small">Devoluciones fáciles</span>
-              </div>
-            </div>
+            <!-- Aviso de envío gratis -->
+            <p class="shipping-note" *ngIf="cart.length > 0">
+              <i class="bi bi-truck me-1"></i>
+              @if (total > 20) {
+              ¡Tu envío es gratis! Cubrimos hasta $3 de envío.
+              } @else {
+              Si tu compra supera los $20, el envío es gratis: cubrimos hasta $3 de envío.
+              Te faltan {{ (20 - total) | currency: 'USD' }}.
+              }
+            </p>
 
           </div>
         </div>

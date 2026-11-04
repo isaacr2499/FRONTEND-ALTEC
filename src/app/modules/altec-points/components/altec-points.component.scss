@@ -1,74 +1,62 @@
-// ── Design tokens ─────────────────────────────────────────────────────────
-$primary:       #6c5ce7;
-$primary-light: #a29bfe;
+// ── Design tokens (mismos del Cotizador y Bodega) ─────────────────────────
+$primary:       #60A5FA;
+$primary-light: #93C5FD;
+$purple:        #8B50FB;
 $gold:          #fdcb6e;
-$gold-dark:     #e17055;
-$text-primary:  #e8eaf0;
-$text-muted:    #8892a4;
-$border:        rgba(255, 255, 255, 0.1);
-$card-bg:       rgba(255, 255, 255, 0.05);
+$text-primary:  #E6EDF3;
+$text-muted:    #8B949E;
+$border:        rgba(96, 165, 250, 0.2);
+$card-bg:       rgba(22, 27, 34, 0.95);
 
 // ── Page ──────────────────────────────────────────────────────────────────
 .altec-points-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0d1b2e 100%);
-  padding: 1rem 0 2rem;
+  background: linear-gradient(135deg, #0D1117, #161B22, #0D1117);
+  padding: 1.25rem 0 2rem;
 }
 
 // ── Header ────────────────────────────────────────────────────────────────
 .page-header {
   text-align: center;
 
-  .header-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, rgba(253,203,110,0.25), rgba(225,112,85,0.15));
-    border: 1px solid rgba(253,203,110,0.3);
+  .page-title {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    color: $gold;
-    margin: 0 auto 0.75rem;
-  }
 
-  .page-title {
-    font-family: 'Acephimere', sans-serif;
-    font-size: 1.9rem;
-    font-weight: 800;
-    color: $text-primary;
-    text-shadow: 0 0 24px rgba(253, 203, 110, 0.3);
-    margin-bottom: 0.3rem;
-  }
-
-  .page-subtitle {
-    color: $text-muted;
-    font-size: 0.85rem;
-    margin: 0;
+    i { color: $gold; }
   }
 }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: fadeInUp .8s ease-out; }
 
 // ── Cards ─────────────────────────────────────────────────────────────────
 .form-card {
   background: $card-bg;
-  border: 1px solid $border;
-  border-radius: 14px;
+  border: 2px solid $border;
+  border-radius: 16px;
   padding: 1.25rem 1.5rem;
   transition: border-color 0.25s;
   overflow: visible;
 
-  &:hover { border-color: rgba(108, 92, 231, 0.28); }
+  &:hover { border-color: rgba(96, 165, 250, 0.4); }
 }
 
 // ── Labels ────────────────────────────────────────────────────────────────
 .field-label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: $text-muted;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: $primary;
   margin-bottom: 0.5rem;
 }
 
@@ -84,21 +72,20 @@ $card-bg:       rgba(255, 255, 255, 0.05);
 // ── Inputs ────────────────────────────────────────────────────────────────
 .field-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  color: $text-primary;
-  padding: 0.6rem 0.9rem;
-  font-size: 0.9rem;
+  background: #0D1117;
+  border: 2px solid rgba(96, 165, 250, 0.3);
+  border-radius: 50px;
+  color: #fff;
+  padding: 0.7rem 1.25rem;
+  font-size: 0.95rem;
   outline: none;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  transition: all 0.3s ease;
 
-  &::placeholder { color: rgba(255, 255, 255, 0.22); }
+  &::placeholder { color: $text-muted; }
 
   &:focus {
-    background: rgba(108, 92, 231, 0.1);
-    border-color: rgba(108, 92, 231, 0.55);
-    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.12);
+    border-color: $primary;
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2), 0 4px 20px rgba(96, 165, 250, 0.3);
   }
 }
 
@@ -108,15 +95,15 @@ $card-bg:       rgba(255, 255, 255, 0.05);
 
   .input-icon {
     position: absolute;
-    left: 0.85rem;
+    left: 1.25rem;
     top: 50%;
     transform: translateY(-50%);
-    color: $text-muted;
-    font-size: 0.85rem;
+    color: $primary;
+    font-size: 1.05rem;
     pointer-events: none;
   }
 
-  .with-icon { padding-left: 2.2rem; }
+  .with-icon { padding-left: 3rem; }
 }
 
 // Input con prefijo $
@@ -125,16 +112,16 @@ $card-bg:       rgba(255, 255, 255, 0.05);
 
   .input-prefix {
     position: absolute;
-    left: 0.85rem;
+    left: 1.35rem;
     top: 50%;
     transform: translateY(-50%);
-    color: $text-muted;
+    color: #4ade80;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 1rem;
     pointer-events: none;
   }
 
-  .with-prefix { padding-left: 1.85rem; }
+  .with-prefix { padding-left: 2.6rem; }
 }
 
 // ── Autocomplete ──────────────────────────────────────────────────────────
@@ -148,9 +135,9 @@ $card-bg:       rgba(255, 255, 255, 0.05);
   left: 0;
   right: 0;
   z-index: 2000;
-  background: #1a1a2e;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
+  background: #161B22;
+  border: 2px solid rgba(96, 165, 250, 0.3);
+  border-radius: 14px;
   padding: 0.25rem 0;
   max-height: 260px;
   overflow-y: auto;
@@ -160,7 +147,7 @@ $card-bg:       rgba(255, 255, 255, 0.05);
 
   &::-webkit-scrollbar { width: 4px; }
   &::-webkit-scrollbar-thumb {
-    background: rgba(108, 92, 231, 0.45);
+    background: rgba(96, 165, 250, 0.45);
     border-radius: 2px;
   }
 }
@@ -179,7 +166,7 @@ $card-bg:       rgba(255, 255, 255, 0.05);
   transition: background 0.15s;
 
   &:hover, &.active {
-    background: rgba(108, 92, 231, 0.18);
+    background: rgba(96, 165, 250, 0.15);
     color: $primary-light;
   }
 
@@ -205,16 +192,16 @@ $card-bg:       rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: linear-gradient(135deg, rgba(108,92,231,0.12) 0%, rgba(162,155,254,0.06) 100%);
-  border: 1px solid rgba(108, 92, 231, 0.28);
-  border-radius: 10px;
+  background: rgba(96, 165, 250, 0.08);
+  border: 2px solid rgba(96, 165, 250, 0.3);
+  border-radius: 14px;
   padding: 0.85rem 1rem;
 
   .suc-avatar {
     width: 38px;
     height: 38px;
     border-radius: 10px;
-    background: rgba(108,92,231,0.25);
+    background: rgba(96, 165, 250, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -269,22 +256,25 @@ $card-bg:       rgba(255, 255, 255, 0.05);
   letter-spacing: 0.3px;
 }
 
-// ── Botón submit ──────────────────────────────────────────────────────────
+// ── Botón submit (mismo estilo de botones del Cotizador) ─────────────────
 .btn-submit {
-  background: linear-gradient(135deg, $gold-dark 0%, $gold 100%);
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #10B981, #059669);
   border: none;
-  border-radius: 10px;
-  color: #1a1a2e;
-  font-weight: 800;
-  font-size: 0.95rem;
-  padding: 0.75rem 2.75rem;
+  border-radius: 50px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.75rem 2.5rem;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 20px rgba(253, 203, 110, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 
   &:hover {
+    background: linear-gradient(135deg, #059669, #047857);
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(253, 203, 110, 0.45);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
   }
 
   &:active { transform: translateY(0); }
@@ -292,8 +282,8 @@ $card-bg:       rgba(255, 255, 255, 0.05);
 
 // ── Footer ────────────────────────────────────────────────────────────────
 .footer-text {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.8rem;
+  color: $text-muted;
 
   strong { color: #8b50fb; }
 }

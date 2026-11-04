@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
-import { NgForOf, CurrencyPipe, NgIf } from '@angular/common';
+import { NgForOf, CurrencyPipe, NgIf, NgClass } from '@angular/common';
 import { ProductService } from "../../warehouse/services/warehouse.service";
 import { LoaderService } from "../../../shared/services/LoaderService";
 import { LoaderComponent } from "../../../shared/components/LoaderComponent";
@@ -18,14 +18,13 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
     ReactiveFormsModule,
     CurrencyPipe,
     NgIf,
+    NgClass,
     LoaderComponent
   ],
   templateUrl: './store.component.html',
   styleUrl: './store.component.scss'
 })
-export class StoreComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('neuronCanvas') neuronCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('storeHero') storeHero!: ElementRef<HTMLDivElement>;
+export class StoreComponent implements OnInit {
   @ViewChild('resultsSection') resultsSection!: ElementRef<HTMLElement>;
 
   public formGroup!: UntypedFormGroup;
@@ -39,13 +38,14 @@ export class StoreComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedProduct: any = null;
   selectedValue: string = '';
 
-  // Control de vista compacta
-  isSearching: boolean = false;
+  // Vista previa de un producto (foto y nombre completos)
+  previewProduct: any = null;
 
-  // Neuronas
-  private animationId: number | null = null;
-  private neurons: Neuron[] = [];
-  private mouse = { x: 0, y: 0 };
+  // Filtros laterales (desktop): plegados hasta que se pulsa "Filtros"
+  filtersOpen = false;
+
+  // Vista de productos: cuadrícula o listado (se recuerda en este navegador)
+  viewMode: 'grid' | 'list' = this.readViewMode();
 
   resistorValues: string[] = [
     '1Ω', '8.2Ω', '10Ω', '20Ω', '22Ω', '27Ω', '47Ω', '56Ω', '62Ω', '68Ω', '75Ω', '82Ω',
@@ -98,6 +98,30 @@ export class StoreComponent implements OnInit, AfterViewInit, OnDestroy {
     private loaderService: LoaderService,
     private cartService: CartService
   ) { }
+
+  openPreview(product: any): void {
+    this.previewProduct = product;
+  }
+
+  @HostListener('document:keydown.escape')
+  closePreview(): void {
+    this.previewProduct = null;
+  }
+
+  /** Agrega desde la vista previa; se cierra antes por si el producto abre su propio modal (resistencias, LEDs). */
+  addFromPreview(product: any): void {
+    this.closePreview();
+    this.addToCart(product);
+  }
+
+  setViewMode(mode: 'grid' | 'list'): void {
+    this.viewMode = mode;
+    try { localStorage.setItem('altec.storeView', mode); } catch { }
+  }
+
+  private readViewMode(): 'grid' | 'list' {
+    try { return localStorage.getItem('altec.storeView') === 'list' ? 'list' : 'grid'; } catch { return 'grid'; }
+  }
 
   ngOnInit(): void {
     this.isDistribuidor = sessionStorage.getItem('isDistribuidor') === 'true';
@@ -266,8 +290,6 @@ export class StoreComponent implements OnInit, AfterViewInit, OnDestroy {
     const tokens = this.tokenize(raw);
     let filtered = this.allProducts;
 
-    // Activar modo búsqueda si hay términos o categorías seleccionadas
-    this.isSearching = tokens.length > 0 || this.selectedCategories.length > 0;
 
     if (tokens.length) {
       filtered = this.allProducts
@@ -409,145 +431,5 @@ export class StoreComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (product.cantidad > 1) {
       product.cantidad--;
     }
-  }
-
-  ngAfterViewInit(): void {
-    this.initNeuronNetwork();
-  }
-
-  ngOnDestroy(): void {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-    }
-  }
-
-  private initNeuronNetwork(): void {
-    const canvas = this.neuronCanvas?.nativeElement;
-    const hero = this.storeHero?.nativeElement;
-
-    if (!canvas || !hero) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Configurar tamaño del canvas
-    const resizeCanvas = () => {
-      canvas.width = hero.offsetWidth;
-      canvas.height = hero.offsetHeight;
-    };
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // Crear neuronas (menos en móvil para mejor performance)
-    const isMobile = window.innerWidth < 768;
-    const neuronCount = isMobile ? 30 : 90; // 3 veces menos en móvil
-    for (let i = 0; i < neuronCount; i++) {
-      this.neurons.push(new Neuron(canvas.width, canvas.height));
-    }
-
-    // Evento de mouse
-    hero.addEventListener('mousemove', (e: MouseEvent) => {
-      const rect = hero.getBoundingClientRect();
-      this.mouse.x = e.clientX - rect.left;
-      this.mouse.y = e.clientY - rect.top;
-    });
-
-    // Animación
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Actualizar y dibujar neuronas
-      this.neurons.forEach(neuron => {
-        neuron.update(this.mouse);
-        neuron.draw(ctx);
-      });
-
-      // Dibujar conexiones entre neuronas cercanas
-      this.drawConnections(ctx);
-
-      this.animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
-  }
-
-  private drawConnections(ctx: CanvasRenderingContext2D): void {
-    const maxDistance = 120;
-
-    for (let i = 0; i < this.neurons.length; i++) {
-      for (let j = i + 1; j < this.neurons.length; j++) {
-        const dx = this.neurons[i].x - this.neurons[j].x;
-        const dy = this.neurons[i].y - this.neurons[j].y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < maxDistance) {
-          const opacity = (1 - distance / maxDistance) * 0.4;
-          // Conexiones en azul brillante futurista
-          ctx.strokeStyle = `rgba(96, 165, 250, ${opacity})`;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.moveTo(this.neurons[i].x, this.neurons[i].y);
-          ctx.lineTo(this.neurons[j].x, this.neurons[j].y);
-          ctx.stroke();
-        }
-      }
-    }
-  }
-}
-
-// 🧠 Clase Neuron para el efecto de red neuronal
-class Neuron {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  radius: number;
-  baseX: number;
-  baseY: number;
-
-  constructor(canvasWidth: number, canvasHeight: number) {
-    this.x = Math.random() * canvasWidth;
-    this.y = Math.random() * canvasHeight;
-    this.baseX = this.x;
-    this.baseY = this.y;
-    this.vx = (Math.random() - 0.5) * 0.5;
-    this.vy = (Math.random() - 0.5) * 0.5;
-    this.radius = Math.random() * 2 + 1;
-  }
-
-  update(mouse: { x: number; y: number }): void {
-    // Movimiento base
-    this.x += this.vx;
-    this.y += this.vy;
-
-    // Atracción al mouse
-    const dx = mouse.x - this.x;
-    const dy = mouse.y - this.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const maxDistance = 150;
-
-    if (distance < maxDistance) {
-      const force = (1 - distance / maxDistance) * 2;
-      this.x += dx * force * 0.02;
-      this.y += dy * force * 0.02;
-    }
-
-    // Retorno suave a la posición base
-    this.x += (this.baseX - this.x) * 0.02;
-    this.y += (this.baseY - this.y) * 0.02;
-  }
-
-  draw(ctx: CanvasRenderingContext2D): void {
-    // Color azul brillante futurista
-    ctx.fillStyle = 'rgba(96, 165, 250, 0.9)';
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Glow effect azul futurista
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = 'rgba(59, 130, 246, 0.8)';
-    ctx.fill();
-    ctx.shadowBlur = 0;
   }
 }

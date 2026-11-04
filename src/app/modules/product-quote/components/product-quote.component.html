@@ -5,42 +5,38 @@
     <!-- 🎨 Hero Section -->
     <div class="quote-hero">
       <div class="container">
-        <h1 class="hero-title animate-fade-in">
-          <i class="bi bi-calculator-fill me-3"></i>
-          Cotización <span class="text-gradient">Rápida</span>
-        </h1>
-        <p class="hero-subtitle animate-fade-in-delay">
-          Busca productos y genera cotizaciones profesionales en segundos
-        </p>
-        <button type="button" class="btn-historial animate-fade-in-delay" (click)="abrirHistorial()">
-          <i class="bi bi-clock-history me-2"></i>
-          Historial de Cotizaciones
-        </button>
-      </div>
-    </div>
-
-    <!-- 🔍 Barra de búsqueda moderna -->
-    <div class="search-section">
-      <div class="container">
-        <div class="search-wrapper">
-          <i class="bi bi-search search-icon"></i>
-          <input
-            type="search"
-            class="search-input"
-            placeholder="Buscar por código o descripción del producto..."
-            formControlName="searchControl"
-            spellcheck="false">
-          <button type="button" class="search-clear" *ngIf="formGroup.get('searchControl')?.value">
-            <i class="bi bi-x-circle-fill"></i>
+        <!-- Historial a la izquierda, al nivel del título -->
+        <div class="hero-row">
+          <button type="button" class="btn-historial animate-fade-in-delay" (click)="abrirHistorial()">
+            <i class="bi bi-clock-history me-2"></i>
+            Historial de Cotizaciones
           </button>
+          <h1 class="hero-title animate-fade-in">
+            <i class="bi bi-calculator-fill me-3"></i>
+            Cotizador
+          </h1>
         </div>
       </div>
     </div>
 
-    <!-- 🔹 Filtros modernos -->
+    <!-- 🔹 Buscador y filtros en una sola fila -->
     <div class="filters-section">
       <div class="container">
         <div class="filters-wrapper">
+
+          <!-- 🔍 Buscador -->
+          <div class="search-wrapper">
+            <i class="bi bi-search search-icon"></i>
+            <input
+              type="search"
+              class="search-input"
+              placeholder="Buscar por código o descripción del producto..."
+              formControlName="searchControl"
+              spellcheck="false">
+            <button type="button" class="search-clear" *ngIf="formGroup.get('searchControl')?.value">
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+          </div>
 
           <!-- Filtro: Importación -->
           <div class="filter-chip">

@@ -74,14 +74,6 @@ export class HeaderComponent implements OnInit {
     this._router.navigate(['/warehouse/inventario']);
   }
 
-  navigateToIngreso(): void {
-    this._router.navigate(['/warehouse/add-product']);
-  }
-
-  navigateToEditProduct(): void {
-    this._router.navigate(['/warehouse/edit-product']);
-  }
-
   navigateToSalesModule(): void {
     this._router.navigate([`/${R_SALES_MODULE}`]);
   }

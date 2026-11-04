@@ -59,33 +59,12 @@
           </a>
         </li>
 
-        <!-- Inventario (Dropdown - Solo admin) -->
-        <li class="nav-item dropdown" *ngIf="!isExternal && role !== 'Distribuidor' && role !== 'Cliente'">
-          <a class="nav-link dropdown-toggle" href="#" id="dropdownInventario"
-             role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <!-- Bodega (Solo admin): consultar, cargar y editar productos -->
+        <li class="nav-item" *ngIf="!isExternal && role !== 'Distribuidor' && role !== 'Cliente'">
+          <a class="nav-link" (click)="navigateToBodega()" routerLinkActive="active">
             <i class="bi bi-box-seam-fill me-2"></i>
-            <span>Inventario</span>
+            <span>Bodega</span>
           </a>
-          <ul class="dropdown-menu modern-dropdown">
-            <li>
-              <a class="dropdown-item" (click)="navigateToBodega()">
-                <i class="bi bi-archive-fill me-2"></i>
-                Consultar Bodega
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" (click)="navigateToIngreso()">
-                <i class="bi bi-plus-circle-fill me-2"></i>
-                Cargar Productos
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" (click)="navigateToEditProduct()">
-                <i class="bi bi-pencil-square me-2"></i>
-                Editar Productos
-              </a>
-            </li>
-          </ul>
         </li>
 
         <!-- Ventas (Dropdown - Solo admin) -->

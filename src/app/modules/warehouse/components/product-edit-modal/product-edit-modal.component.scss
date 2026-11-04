@@ -1,0 +1,533 @@
+// Ventana de edición de productos (antes en la pantalla "Editar Productos")
+.modern-modal {
+  .modal-content {
+    background: rgba(22, 27, 34, .98) !important;
+    border: 2px solid rgba(96, 165, 250, .2);
+    border-radius: 16px;
+  }
+}
+.modern-modal-header {
+  background: linear-gradient(135deg, #0C1E3A, #020617);
+  border-bottom: 1px solid rgba(96, 165, 250, .2);
+  padding: 1rem;
+
+  .modal-title {
+    color: #fff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+  }
+}
+.modern-modal-body {
+  padding: 1.25rem;
+  background: #0D1117 !important;
+}
+
+.modern-modal-footer {
+  background: rgba(13, 17, 23, .8);
+  border-top: 1px solid rgba(96, 165, 250, .2);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.modal-footer-right {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+}
+
+.btn-modal-delete {
+  padding: .625rem 1.25rem;
+  background: rgba(239, 68, 68, .12);
+  border: 2px solid rgba(239, 68, 68, .35);
+  border-radius: 50px;
+  color: #ef4444;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  transition: all .3s ease;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, .25);
+    border-color: #ef4444;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, .3);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.btn-modal-cancel {
+  padding: .625rem 1.25rem;
+  background: rgba(239, 68, 68, .15);
+  border: 2px solid rgba(239, 68, 68, .3);
+  border-radius: 50px;
+  color: #EF4444;
+  font-weight: 600;
+  transition: all .3s ease;
+
+  &:hover {
+    background: rgba(239, 68, 68, .25);
+    transform: translateY(-2px);
+  }
+}
+
+.btn-modal-confirm {
+  padding: .625rem 1.25rem;
+  background: linear-gradient(135deg, #10B981, #059669);
+  border: none;
+  border-radius: 50px;
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  transition: all .3s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, .4);
+  }
+}
+
+
+// 📝 ESTILOS PARA EL MODAL DE EDICIÓN
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.form-label {
+  color: #60A5FA;
+  font-size: .95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.form-input-modern,
+.form-select-modern {
+  width: 100%;
+  padding: .75rem;
+  background: rgba(22, 27, 34, .95);
+  border: 2px solid rgba(96, 165, 250, .3);
+  border-radius: 10px;
+  color: #E6EDF3;
+  font-size: .95rem;
+  font-weight: 500;
+  transition: all .3s ease;
+
+  &::placeholder {
+    color: #8B949E;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #60A5FA;
+    background: rgba(22, 27, 34, 1);
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, .2);
+  }
+}
+
+.form-select-modern {
+  option {
+    background: #161B22;
+    color: #E6EDF3;
+    padding: .5rem;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+// Switch para "Es importado"
+.form-group-switch {
+  padding: 1rem;
+  background: rgba(96, 165, 250, .05);
+  border: 2px solid rgba(96, 165, 250, .2);
+  border-radius: 12px;
+  margin: .5rem 0;
+}
+
+.switch-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.switch-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+
+  &:checked + .switch-label .switch-status {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: #fff;
+    border-color: #10B981;
+  }
+}
+
+.switch-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch-text {
+  color: #E6EDF3;
+  font-weight: 600;
+  font-size: .95rem;
+  display: flex;
+  align-items: center;
+}
+
+.switch-status {
+  padding: .375rem .875rem;
+  background: rgba(239, 68, 68, .2);
+  border: 2px solid rgba(239, 68, 68, .3);
+  border-radius: 20px;
+  color: #EF4444;
+  font-weight: 700;
+  font-size: .85rem;
+  transition: all .3s ease;
+  min-width: 50px;
+  text-align: center;
+}
+
+// ── Preview de imagen seleccionada ─────────────────────────────
+// ---- Drop Zone ----
+.drop-zone {
+  position: relative;
+  min-height: 120px;
+  border-radius: 14px;
+  border: 2px dashed rgba(96, 165, 250, 0.2);
+  background: rgba(96, 165, 250, 0.03);
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &.drop-zone-active {
+    border-color: #60A5FA;
+    background: rgba(96, 165, 250, 0.08);
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15);
+
+    // Mientras se arrastra, los hijos no deben capturar eventos (evita el parpadeo)
+    * {
+      pointer-events: none;
+    }
+  }
+
+  .image-preview-wrapper,
+  .image-current-wrapper {
+    margin-bottom: 0;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+.drop-zone-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: rgba(96, 165, 250, 0.4);
+
+  i {
+    font-size: 2.5rem;
+  }
+
+  span {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+}
+
+.drop-zone-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(96, 165, 250, 0.12);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  color: #60A5FA;
+  animation: dropPulse 0.8s ease-in-out infinite;
+
+  i {
+    font-size: 2.5rem;
+  }
+
+  span {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+}
+
+@keyframes dropPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+.image-preview-wrapper {
+  position: relative;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(96, 165, 250, 0.5);
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.1);
+
+  .image-preview {
+    display: block;
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .image-preview-badge {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(0deg, rgba(96, 165, 250, 0.85) 0%, transparent 100%);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 10px 12px 8px;
+    display: flex;
+    align-items: center;
+    i { color: #a8d8ff; }
+  }
+}
+
+.image-current-wrapper {
+  position: relative;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  .image-current {
+    display: block;
+    width: 100%;
+    max-height: 160px;
+    object-fit: contain;
+    background: rgba(0, 0, 0, 0.2);
+    opacity: 0.7;
+  }
+
+  .image-current-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 5px 10px;
+    text-align: center;
+  }
+}
+
+// ── Spinner del botón Guardar ────────────────────────────────────
+.save-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinSave 0.7s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spinSave {
+  to { transform: rotate(360deg); }
+}
+
+// ────────────────────────────────────────────────────────────────
+// File input estilizado
+.file-input-wrapper {
+  position: relative;
+}
+
+.file-input-modern {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.file-input-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: .75rem 1.25rem;
+  background: rgba(96, 165, 250, .15);
+  border: 2px dashed rgba(96, 165, 250, .3);
+  border-radius: 10px;
+  color: #60A5FA;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .3s ease;
+
+  &:hover {
+    background: rgba(96, 165, 250, .25);
+    border-color: #60A5FA;
+    transform: translateY(-2px);
+  }
+}
+
+
+// Ajustes responsive para modal
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modern-modal-body {
+    padding: 1rem;
+  }
+
+  .switch-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: .75rem;
+  }
+
+  .switch-status {
+    text-align: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .form-label {
+    font-size: .9rem;
+  }
+
+  .form-input-modern,
+  .form-select-modern {
+    font-size: .9rem;
+    padding: .65rem;
+  }
+
+  .btn-modal-cancel,
+  .btn-modal-confirm {
+    padding: .5rem 1rem;
+    font-size: .85rem;
+  }
+}
+
+// ── Diseño compacto: foto a la izquierda y datos a la derecha ───────
+.modern-modal-header { padding: .75rem 1rem; }
+.modern-modal-body { padding: 1rem 1.25rem; }
+.modern-modal-footer { padding: .75rem 1.25rem; }
+
+.edit-form { gap: 0; }
+
+.edit-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.edit-photo {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+
+  .drop-zone {
+    min-height: 170px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .image-preview-wrapper,
+  .image-current-wrapper {
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  .image-preview-wrapper .image-preview,
+  .image-current-wrapper .image-current {
+    max-height: 170px;
+  }
+
+  .file-input-label {
+    width: 100%;
+    justify-content: center;
+    font-size: .85rem;
+    padding: .5rem .75rem;
+  }
+}
+
+.edit-fields {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  min-width: 0;
+}
+
+.form-group { gap: .3rem; }
+
+.form-label { font-size: .8rem; }
+
+.form-input-modern,
+.form-select-modern {
+  padding: .5rem .65rem;
+  font-size: .9rem;
+  border-width: 1.5px;
+  border-radius: 8px;
+}
+
+.form-row { gap: .75rem; }
+
+.form-row-4 { grid-template-columns: repeat(4, 1fr); }
+
+.form-group-switch {
+  margin: 0;
+  padding: .5rem .85rem;
+  border-width: 1.5px;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .edit-layout { grid-template-columns: 1fr; }
+  .form-row-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+.req-star {
+  color: #F87171;
+  margin-left: .2rem;
+}

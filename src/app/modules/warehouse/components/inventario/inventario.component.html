@@ -9,10 +9,9 @@
         <i class="bi bi-box-seam me-2"></i>
         Consultar Inventario
       </h1>
-      <p class="subtitle">Gestiona y consulta productos de bodega</p>
     </div>
 
-    <div class="container">
+    <div class="container-fluid px-3 px-lg-4">
       <!-- Buscador moderno -->
       <div class="row justify-content-center mb-4">
         <div class="col-12 col-lg-8">
@@ -29,8 +28,8 @@
       </div>
 
       <!-- Filtros activos (chips) -->
-      <div class="row justify-content-center mb-3" *ngIf="selectedCategory || onlyImport || onlyLowStock">
-        <div class="col-12 col-lg-10">
+      <div class="row justify-content-center mb-3" *ngIf="selectedCategory || onlyImport || onlyLowStock || onlyNoImage">
+        <div class="col-12">
           <div class="d-flex flex-wrap gap-2 justify-content-center">
             <span class="filter-chip" *ngIf="selectedCategory">
               <i class="bi bi-tag-fill me-1"></i>
@@ -53,13 +52,20 @@
                 <i class="bi bi-x"></i>
               </button>
             </span>
+            <span class="filter-chip" *ngIf="onlyNoImage">
+              <i class="bi bi-image me-1"></i>
+              Sin imagen
+              <button type="button" class="btn-close-chip" (click)="formGroup.get('noImageCheck')?.setValue(false); toggleNoImage()">
+                <i class="bi bi-x"></i>
+              </button>
+            </span>
           </div>
         </div>
       </div>
 
       <!-- Controles de filtros -->
       <div class="row justify-content-center mb-4">
-        <div class="col-12 col-lg-10">
+        <div class="col-12">
           <div class="filters-container">
             <!-- Checkbox importación -->
             <div class="filter-item">
@@ -84,6 +90,19 @@
               <label class="form-check-label" for="lowStockCheck">
                 <i class="bi bi-exclamation-triangle me-1"></i>
                 Stock < 5
+              </label>
+            </div>
+
+            <!-- Checkbox sin imagen -->
+            <div class="filter-item">
+              <input class="form-check-input modern-checkbox"
+                     type="checkbox"
+                     id="noImageCheck"
+                     formControlName="noImageCheck"
+                     (change)="toggleNoImage()">
+              <label class="form-check-label" for="noImageCheck">
+                <i class="bi bi-image me-1"></i>
+                Sin imagen
               </label>
             </div>
 
@@ -116,13 +135,19 @@
               <i class="bi bi-file-earmark-pdf me-1"></i>
               Catálogo
             </button>
+
+            <!-- ➕ Nuevo producto -->
+            <button type="button" class="btn btn-new-product" (click)="openNewProduct()">
+              <i class="bi bi-plus-circle-fill me-1"></i>
+              Nuevo producto
+            </button>
           </div>
         </div>
       </div>
 
       <!-- Información de resultados -->
       <div class="row justify-content-center mb-3">
-        <div class="col-12 col-lg-10">
+        <div class="col-12">
           <div class="results-info">
             <span class="total-badge">
               <i class="bi bi-box me-1"></i>
@@ -137,7 +162,7 @@
 
       <!-- Tabla de productos moderna -->
       <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
+        <div class="col-12">
           <div class="table-modern-wrapper">
             <div class="table-responsive">
               <table class="table table-modern">
@@ -145,9 +170,24 @@
                   <tr>
                     <th class="col-code">Código</th>
                     <th class="col-desc">Descripción</th>
-                    <th class="col-price">PVP</th>
-                    <th class="col-stock">Stock</th>
+                    <th class="col-price sortable" [class.sorted]="sortField === 'pvp'" (click)="toggleSort('pvp')"
+                      [title]="sortField === 'pvp' && sortDir === 'desc' ? 'Ordenar de menor a mayor' : 'Ordenar de mayor a menor'">
+                      PVP <i class="bi" [ngClass]="sortIcon('pvp')"></i>
+                    </th>
+                    <th class="col-margin sortable" [class.sorted]="sortField === '_margen'" (click)="toggleSort('_margen')"
+                      [title]="sortField === '_margen' && sortDir === 'desc' ? 'Ordenar de menor a mayor' : 'Ordenar de mayor a menor'">
+                      Ganancia $ <i class="bi" [ngClass]="sortIcon('_margen')"></i>
+                    </th>
+                    <th class="col-margin sortable" [class.sorted]="sortField === '_margenPct'" (click)="toggleSort('_margenPct')"
+                      [title]="sortField === '_margenPct' && sortDir === 'desc' ? 'Ordenar de menor a mayor' : 'Ordenar de mayor a menor'">
+                      Margen % <i class="bi" [ngClass]="sortIcon('_margenPct')"></i>
+                    </th>
+                    <th class="col-stock sortable" [class.sorted]="sortField === 'stock'" (click)="toggleSort('stock')"
+                      [title]="sortField === 'stock' && sortDir === 'desc' ? 'Ordenar de menor a mayor' : 'Ordenar de mayor a menor'">
+                      Stock <i class="bi" [ngClass]="sortIcon('stock')"></i>
+                    </th>
                     <th class="col-image">Imagen</th>
+                    <th class="col-actions"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -166,6 +206,15 @@
                     <td class="price-cell">
                       <span class="price-tag">{{ product.pvp | currency }}</span>
                     </td>
+                    <ng-template #sinCosto><span class="margin-none" title="Sin precio de importación">—</span></ng-template>
+                    <td class="margin-cell">
+                      <span *ngIf="product._margen != null; else sinCosto" class="margin-tag"
+                        [class.negative]="product._margen < 0">{{ product._margen | currency }}</span>
+                    </td>
+                    <td class="margin-cell">
+                      <span *ngIf="product._margenPct != null; else sinCosto" class="margin-pct-tag"
+                        [class.negative]="product._margenPct < 0">{{ product._margenPct | number:'1.0-0' }}%</span>
+                    </td>
                     <td class="stock-cell">
                       <span class="stock-badge" [class.low-stock]="product.stock < 5">
                         {{ product.stock }}
@@ -181,6 +230,12 @@
                         </div>
                       </ng-template>
                     </td>
+                    <td class="actions-cell">
+                      <button type="button" class="btn-edit-row" title="Editar producto"
+                        (click)="openEditModal(product, $event)">
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -191,7 +246,7 @@
 
       <!-- Paginación moderna -->
       <div class="row justify-content-center mt-4 mb-4">
-        <div class="col-12 col-lg-10">
+        <div class="col-12">
           <div class="pagination-container">
             <button class="btn btn-pagination"
                     (click)="onPreviousPage()"
@@ -228,16 +283,17 @@
   <!-- Modal de detalles del producto -->
   <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content modal-dark">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-info-circle me-2"></i>
-            Detalles del Producto
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
+      <div class="modal-content modal-dark product-modal">
         <div class="modal-body">
+          <!-- La X queda a la altura del nombre del producto -->
+          <button type="button" class="btn-close btn-close-white product-modal-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           <app-extra-product-info [product]="selectedProduct"></app-extra-product-info>
+          <div class="product-modal-actions">
+            <button type="button" class="btn-edit-detail" (click)="editFromDetails()">
+              <i class="bi bi-pencil-square me-2"></i>
+              Editar producto
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -278,3 +334,7 @@
     </div>
   </div>
 </div>
+
+<!-- ✏️ Ventana de producto: nuevo y edición -->
+<app-product-edit-modal #editModal (saved)="onProductSaved($event)" (deleted)="onProductDeleted($event)"
+  (created)="getAllProducts()"></app-product-edit-modal>

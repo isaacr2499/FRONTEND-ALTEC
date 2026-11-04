@@ -1,0 +1,229 @@
+<!-- 🔲 MODAL DE PRODUCTO: nuevo o edición -->
+<div class="modal fade" id="productEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content modern-modal">
+      <div class="modal-header modern-modal-header">
+        <h5 class="modal-title">
+          <i class="bi me-2" [ngClass]="isNew ? 'bi-plus-circle-fill' : 'bi-pencil-square'"></i>
+          {{ isNew ? 'Nuevo Producto' : 'Editar Producto' }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body modern-modal-body" *ngIf="selectedProduct">
+        <form class="edit-form">
+          <div class="edit-layout">
+
+            <!-- 📷 Foto (columna izquierda) -->
+            <div class="edit-photo">
+              <label class="form-label">
+                <i class="bi bi-image me-2"></i>
+                Foto
+              </label>
+
+              <div class="drop-zone"
+                [class.drop-zone-active]="isDragging"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)">
+
+                <!-- Preview de imagen seleccionada -->
+                <div class="image-preview-wrapper" *ngIf="imagePreview">
+                  <img [src]="imagePreview" class="image-preview" alt="Vista previa">
+                  <div class="image-preview-badge">
+                    <i class="bi bi-check-circle-fill me-1"></i>
+                    Nueva imagen
+                  </div>
+                </div>
+
+                <!-- Imagen actual (cuando no hay preview nueva) -->
+                <div class="image-current-wrapper" *ngIf="!imagePreview && selectedProduct?.foto && selectedProduct.foto !== 'NOT-IMAGE'">
+                  <img [src]="selectedProduct.foto" class="image-current" alt="Imagen actual">
+                  <span class="image-current-label">Imagen actual</span>
+                </div>
+
+                <!-- Hint de drag cuando no hay imagen -->
+                <div class="drop-zone-hint" *ngIf="!imagePreview && (!selectedProduct?.foto || selectedProduct.foto === 'NOT-IMAGE')">
+                  <i class="bi bi-cloud-arrow-up"></i>
+                  <span>Arrastra una imagen aquí</span>
+                </div>
+
+                <!-- Overlay al arrastrar -->
+                <div class="drop-zone-overlay" *ngIf="isDragging">
+                  <i class="bi bi-cloud-arrow-up-fill"></i>
+                  <span>Suelta la imagen aquí</span>
+                </div>
+              </div>
+
+              <div class="file-input-wrapper">
+                <input
+                  type="file"
+                  class="file-input-modern"
+                  id="editFileInput"
+                  (change)="onFileSelected($event)"
+                  [accept]="isNew ? 'image/jpeg,image/png' : 'image/*'">
+                <label for="editFileInput" class="file-input-label">
+                  <i class="bi bi-cloud-upload me-2"></i>
+                  {{ imagePreview ? 'Cambiar imagen' : 'Seleccionar imagen' }}
+                </label>
+              </div>
+            </div>
+
+            <!-- 📝 Datos (columna derecha) -->
+            <div class="edit-fields">
+
+              <!-- Fila: Categoría y Código -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">
+                    <i class="bi bi-tag-fill me-2"></i>
+                    Categoría <span class="req-star" *ngIf="isNew">*</span>
+                  </label>
+                  <select
+                    class="form-select-modern"
+                    [(ngModel)]="selectedProduct.categoria"
+                    name="categoria">
+                    <option *ngIf="isNew" value="" disabled>Seleccionar categoría...</option>
+                    <option *ngIf="!isNew && !categoriasValidas.includes(categoriaActual)" [value]="categoriaActual">
+                      {{ categoriaActual }}
+                    </option>
+                    <option *ngFor="let categoria of categoriasValidas" [value]="categoria">
+                      {{ categoria }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <i class="bi bi-upc-scan me-2"></i>
+                    Código
+                  </label>
+                  <input
+                    type="text"
+                    class="form-input-modern"
+                    [(ngModel)]="selectedProduct.codigo"
+                    name="codigo"
+                    [placeholder]="isNew ? 'Automático (opcional)' : 'Ej: ABC123'">
+                </div>
+              </div>
+
+              <!-- Descripción -->
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-text-left me-2"></i>
+                  Descripción <span class="req-star" *ngIf="isNew">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-input-modern"
+                  [(ngModel)]="selectedProduct.descripcion"
+                  name="descripcion"
+                  placeholder="Descripción del producto">
+              </div>
+
+              <!-- Fila: Stock, PVP, Mayorista e Importación -->
+              <div class="form-row form-row-4">
+                <div class="form-group">
+                  <label class="form-label">
+                    <i class="bi bi-box-seam me-2"></i>
+                    Stock <span class="req-star" *ngIf="isNew">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    class="form-input-modern"
+                    [(ngModel)]="selectedProduct.stock"
+                    name="stock"
+                    placeholder="0">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <i class="bi bi-currency-dollar me-2"></i>
+                    PVP <span class="req-star" *ngIf="isNew">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    class="form-input-modern"
+                    [(ngModel)]="selectedProduct.pvp"
+                    name="pvp"
+                    placeholder="0.00"
+                    step="0.01">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <i class="bi bi-cart-check me-2"></i>
+                    Mayorista <span class="req-star" *ngIf="isNew">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    class="form-input-modern"
+                    [(ngModel)]="selectedProduct.precioMayorista"
+                    name="precioMayorista"
+                    placeholder="0.00"
+                    step="0.01">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <i class="bi bi-globe me-2"></i>
+                    {{ isNew ? 'Precio compra' : 'Importación' }}
+                    <span class="req-star" *ngIf="isNew && selectedProduct.isImport">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    class="form-input-modern"
+                    [(ngModel)]="selectedProduct.precioImportacion"
+                    name="precioImportacion"
+                    placeholder="0.00"
+                    step="0.01">
+                </div>
+              </div>
+
+              <!-- Switch: ¿Es importado? -->
+              <div class="form-group-switch">
+                <div class="switch-container">
+                  <input
+                    type="checkbox"
+                    class="switch-input"
+                    id="editIsImportCheck"
+                    [(ngModel)]="selectedProduct.isImport"
+                    name="isImport">
+                  <label class="switch-label" for="editIsImportCheck">
+                    <span class="switch-text">
+                      <i class="bi bi-globe me-2"></i>
+                      ¿Es producto importado?
+                    </span>
+                    <span class="switch-status">
+                      {{ selectedProduct.isImport ? 'Sí' : 'No' }}
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer modern-modal-footer">
+        <button type="button" class="btn-modal-delete" *ngIf="!isNew" (click)="eliminarProducto()" [disabled]="isSaving">
+          <i class="bi bi-trash3-fill me-2"></i>
+          Eliminar
+        </button>
+        <span *ngIf="isNew"></span>
+        <div class="modal-footer-right">
+          <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal" [disabled]="isSaving">
+            <i class="bi bi-x-circle me-2"></i>
+            Cancelar
+          </button>
+          <button type="button" class="btn-modal-confirm" (click)="isNew ? crearProducto() : guardarEdicion()" [disabled]="isSaving">
+            <span *ngIf="isSaving" class="save-spinner me-2"></span>
+            <i *ngIf="!isSaving" class="bi bi-check-circle-fill me-2"></i>
+            {{ isSaving ? 'Guardando...' : (isNew ? 'Crear producto' : 'Guardar Cambios') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
