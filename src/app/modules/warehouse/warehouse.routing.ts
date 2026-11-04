@@ -1,8 +1,6 @@
 import {Routes} from '@angular/router';
 import {AuthGuard} from "../../core/guard/auth.guard";
 import {InventarioComponent} from "./components/inventario/inventario.component";
-import {AddProductComponent} from "./components/add-product/add-product.component";
-import {EditProductComponent} from "./components/edit-product/edit-product.component";
 
 
 
@@ -13,13 +11,15 @@ export const WAREHOUSE_ROUTES: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    // La carga de productos ahora está en Consultar Bodega ("Nuevo producto"); se mantiene la ruta para enlaces guardados
     path: 'add-product',
-    component: AddProductComponent,
-    canActivate: [AuthGuard]
+    redirectTo: 'inventario',
+    pathMatch: 'full'
   },
   {
+    // La edición de productos ahora está en Consultar Bodega; se mantiene la ruta para enlaces guardados
     path: 'edit-product',
-    component: EditProductComponent,
-    canActivate: [AuthGuard]
+    redirectTo: 'inventario',
+    pathMatch: 'full'
   }
 ];

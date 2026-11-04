@@ -1,116 +1,11 @@
 <app-loader></app-loader>
 
-<!-- 🎨 HERO SECTION MODERNO -->
-<div class="store-hero position-relative" #storeHero [class.hero-compact]="isSearching">
-  <!-- 🧠 Canvas de neuronas animadas -->
-  <canvas #neuronCanvas class="neuron-canvas-store"></canvas>
-
-  <div class="hero-background"></div>
-  <div class="container position-relative">
-    <div class="row justify-content-center" [class.py-5]="!isSearching" [class.py-3]="isSearching">
-      <div class="col-12 col-lg-10 text-center">
-
-        <!-- Saludo personalizado con animación (se oculta al buscar) -->
-        <div class="hero-greeting mb-3" *ngIf="!isSearching">
-          <h1 class="display-4 fw-bold text-white mb-2 animate-fade-in">
-            <span *ngIf="isDistribuidor">¡Hola, {{ distribuidorName }}! 👋</span>
-            <span *ngIf="isCliente && !isDistribuidor">¡Hola, {{ clienteName }}! 🎉</span>
-            <span *ngIf="!isDistribuidor && !isCliente">
-              ¡Bienvenido a la tienda de ALTEC!
-              <i class="bi bi-lightning-charge-fill text-danger ms-2 icon-pulse"></i>
-            </span>
-          </h1>
-
-          <p class="lead text-white-50 mb-4 animate-fade-in-delay">
-            {{
-            isDistribuidor
-            ? 'Accede a precios exclusivos mayoristas y productos premium'
-            : isCliente
-            ? 'Continúa acumulando Altec-Puntos con cada compra'
-            : 'Descubre tecnología de calidad para tus proyectos'
-            }}
-          </p>
-
-          <!-- Badge de rol -->
-          @if (isDistribuidor) {
-          <span class="badge bg-gradient-purple px-4 py-2 rounded-pill mb-4">
-            <i class="bi bi-star-fill me-2"></i>Distribuidor Premium
-          </span>
-          } @else if (isCliente) {
-          <span class="badge bg-gradient-blue px-4 py-2 rounded-pill mb-4">
-            <i class="bi bi-award-fill me-2"></i>Cliente Verificado
-          </span>
-          }
-        </div>
-
-        <!-- Título compacto cuando hay búsqueda -->
-        <div class="hero-search-title mb-2" *ngIf="isSearching">
-          <h3 class="h5 text-white fw-bold mb-0">
-            <i class="bi bi-search me-2"></i>Buscando en ALTEC Store
-          </h3>
-        </div>
-
-        <!-- Barra de búsqueda mejorada -->
-        <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
-          <div class="search-container mx-auto">
-            <div class="input-group input-group-lg shadow-lg">
-              <span class="input-group-text bg-dark border-0">
-                <i class="bi bi-search text-primary"></i>
-              </span>
-              <input type="search" class="form-control form-control-lg border-0 bg-dark text-white"
-                placeholder="Buscar productos, categorías, códigos..." aria-label="Buscar productos"
-                formControlName="searchTerm" (input)="onSearchChange()" spellcheck="false" autocomplete="off"
-                autocapitalize="off" />
-              <button type="button" class="btn btn-primary d-none d-md-inline-flex align-items-center gap-2"
-                (click)="onSearchChange()">
-                <i class="bi bi-search"></i>
-                <span>Buscar</span>
-              </button>
-              <button type="button" class="btn btn-outline-light d-inline-flex d-md-none align-items-center gap-2"
-                data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas" aria-controls="filtersOffcanvas">
-                <i class="bi bi-funnel"></i>
-                <span>Filtros</span>
-              </button>
-            </div>
-          </div>
-        </form>
-
-        <!-- Stats rápidas (se ocultan al buscar) -->
-        <div class="row g-3 mt-4 d-none d-lg-flex" *ngIf="!isSearching">
-          <div class="col-4">
-            <div class="stat-card">
-              <i class="bi bi-box-seam text-primary fs-3 mb-2"></i>
-              <h3 class="h5 text-white mb-0">{{ totalCount }}+</h3>
-              <p class="text-white-50 small mb-0">Productos</p>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="stat-card">
-              <i class="bi bi-lightning-charge text-warning fs-3 mb-2"></i>
-              <h3 class="h5 text-white mb-0">Envío Rápido</h3>
-              <p class="text-white-50 small mb-0">24-48 horas</p>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="stat-card">
-              <i class="bi bi-shield-check text-success fs-3 mb-2"></i>
-              <h3 class="h5 text-white mb-0">Garantía</h3>
-              <p class="text-white-50 small mb-0">Calidad asegurada</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- 🛍️ CONTENEDOR PRINCIPAL DE LA TIENDA -->
 <div class="container-fluid store-container py-4">
   <div class="row g-4">
 
     <!-- 📂 SIDEBAR DE FILTROS (Desktop) -->
-    <aside class="col-lg-3 d-none d-lg-block">
+    <aside class="col-lg-3 d-none filters-aside" [class.d-lg-block]="filtersOpen">
       <div class="filters-sidebar sticky-top">
         <div class="card border-0 shadow-lg">
           <div class="card-body p-4">
@@ -121,7 +16,11 @@
                 <i class="bi bi-funnel-fill text-primary"></i>
                 <span class="fw-bold">Filtros</span>
               </h5>
-              <span class="badge bg-primary rounded-pill">{{ selectedCategories.length }}</span>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-pill">{{ selectedCategories.length }}</span>
+                <button type="button" class="btn-close btn-close-white" aria-label="Ocultar filtros"
+                  title="Ocultar filtros" (click)="filtersOpen = false"></button>
+              </div>
             </div>
 
             <!-- Botón limpiar filtros -->
@@ -228,12 +127,21 @@
     </div>
 
     <!-- 🛍️ GRID DE PRODUCTOS -->
-    <section class="col-12 col-lg-9" #resultsSection>
+    <section class="col-12" [class.col-lg-9]="filtersOpen" #resultsSection>
 
       <!-- Header de resultados -->
       <div class="results-header mb-4">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-          <div>
+          <!-- Botón para desplegar los filtros (desktop) -->
+          <button type="button" class="btn btn-filters-toggle d-none d-lg-inline-flex align-items-center gap-2"
+            [class.active]="filtersOpen" (click)="filtersOpen = !filtersOpen"
+            [title]="filtersOpen ? 'Ocultar filtros' : 'Mostrar filtros'">
+            <i class="bi bi-funnel"></i>
+            <span>Filtros</span>
+            <span class="badge bg-primary rounded-pill" *ngIf="selectedCategories.length > 0">{{ selectedCategories.length }}</span>
+          </button>
+
+          <div class="me-auto">
             <h4 class="mb-1 text-white fw-bold">
               @if (selectedCategories.length > 0) {
               Resultados filtrados
@@ -247,12 +155,32 @@
             </p>
           </div>
 
-          <!-- Controles de vista (opcional para futuro) -->
+          <!-- Buscador -->
+          <form class="store-search flex-grow-1" [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-search"></i>
+              </span>
+              <input type="search" class="form-control"
+                placeholder="Buscar productos, categorías, códigos..." aria-label="Buscar productos"
+                formControlName="searchTerm" (input)="onSearchChange()" spellcheck="false" autocomplete="off"
+                autocapitalize="off" />
+              <button type="button" class="btn btn-outline-light d-inline-flex d-lg-none align-items-center gap-2"
+                data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas" aria-controls="filtersOffcanvas">
+                <i class="bi bi-funnel"></i>
+                <span>Filtros</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Controles de vista -->
           <div class="view-controls d-none d-md-flex gap-2">
-            <button class="btn btn-sm btn-outline-light active">
+            <button type="button" class="btn btn-sm btn-outline-light" title="Cuadrícula"
+              [class.active]="viewMode === 'grid'" (click)="setViewMode('grid')">
               <i class="bi bi-grid-3x3-gap"></i>
             </button>
-            <button class="btn btn-sm btn-outline-light">
+            <button type="button" class="btn btn-sm btn-outline-light" title="Listado"
+              [class.active]="viewMode === 'list'" (click)="setViewMode('list')">
               <i class="bi bi-list"></i>
             </button>
           </div>
@@ -260,9 +188,12 @@
       </div>
 
       <!-- Grid de productos mejorado -->
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+      <div class="row" [ngClass]="viewMode === 'list' ? 'row-cols-1 g-3' : filtersOpen
+        ? 'row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4'
+        : 'row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4'">
         <div class="col" *ngFor="let product of products">
-          <div class="product-card h-100" [class.product-out-of-stock]="isOutOfStock(product)">
+          <div class="product-card h-100" [class.product-out-of-stock]="isOutOfStock(product)"
+            [class.product-card-list]="viewMode === 'list'">
 
             <!-- Badge de categoría -->
             @if (product.categoria) {
@@ -273,7 +204,7 @@
             }
 
             <!-- Imagen del producto -->
-            <div class="product-image-wrapper">
+            <div class="product-image-wrapper" (click)="openPreview(product)" title="Ver foto">
               <ng-container *ngIf="product.foto && product.foto !== 'NOT-IMAGE'; else noImage">
                 <img [src]="product.foto" [alt]="product.descripcion" class="product-image"
                   [style.filter]="isOutOfStock(product) ? 'grayscale(100%) opacity(0.5)' : 'none'">
@@ -416,6 +347,61 @@
   </div>
 </footer>
 <!-- MODAL PARA SELECCIÓN DE VALOR -->
+<!-- 🔍 VISTA PREVIA DEL PRODUCTO (foto y nombre completos) -->
+<div class="preview-overlay" *ngIf="previewProduct" (click)="closePreview()">
+  <div class="preview-card" (click)="$event.stopPropagation()">
+    <button type="button" class="preview-close" aria-label="Cerrar" (click)="closePreview()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <div class="preview-image">
+      <img *ngIf="previewProduct.foto && previewProduct.foto !== 'NOT-IMAGE'; else previewNoImage"
+        [src]="previewProduct.foto" [alt]="previewProduct.descripcion">
+      <ng-template #previewNoImage>
+        <div class="no-image-placeholder">
+          <i class="bi bi-image"></i>
+          <span>Sin imagen</span>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="preview-info">
+      <span class="preview-category" *ngIf="previewProduct.categoria">
+        <i class="bi bi-tag-fill me-1"></i>{{ previewProduct.categoria }}
+      </span>
+      <h4 class="preview-title">{{ previewProduct.descripcion }}</h4>
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-2">
+        <span class="product-code" *ngIf="previewProduct.codigo">
+          <i class="bi bi-upc-scan me-1"></i>{{ previewProduct.codigo }}
+        </span>
+        <span class="preview-price" *ngIf="!isOutOfStock(previewProduct); else previewAgotado">
+          {{ (isDistribuidor ? previewProduct.precioMayorista : previewProduct.pvp) | currency:'USD' }}
+        </span>
+        <ng-template #previewAgotado><span class="preview-agotado">Agotado</span></ng-template>
+      </div>
+
+      <!-- Cantidad y agregar al carrito -->
+      <div class="preview-actions" *ngIf="!isOutOfStock(previewProduct)">
+        <div class="quantity-selector">
+          <button type="button" class="btn" (click)="decrementQuantity(previewProduct)" aria-label="Menos">
+            <i class="bi bi-dash"></i>
+          </button>
+          <input type="number" class="form-control text-center" min="1" aria-label="Cantidad"
+            [(ngModel)]="previewProduct.cantidad" [ngModelOptions]="{standalone: true}">
+          <button type="button" class="btn" (click)="incrementQuantity(previewProduct)" aria-label="Más">
+            <i class="bi bi-plus"></i>
+          </button>
+        </div>
+        <button type="button" class="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+          (click)="addFromPreview(previewProduct)">
+          <i class="bi bi-cart-plus-fill"></i>
+          <span>Agregar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="resistorModal" tabindex="-1" aria-labelledby="resistorModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-dark text-white" style="border-radius: 12px;">

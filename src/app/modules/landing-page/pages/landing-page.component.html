@@ -65,16 +65,9 @@
 
             <!-- Título principal -->
             <h1 class="hero-title animate-fade-in">
-              Bienvenido a <br>
-              <span class="brand-highlight">ALTEC</span>
-              <span class="text-gradient">Mecatrónica</span>
+              Bienvenido a <span class="brand-highlight">ALTEC</span><br>
+              <span class="text-gradient">Robótica y Electrónica</span>
             </h1>
-
-            <!-- Subtítulo -->
-            <p class="hero-subtitle animate-fade-in-delay-1">
-              Explora nuestro catálogo de productos y conviértete en cliente para acumular
-              <strong class="text-success">Altec-Puntos</strong>
-            </p>
 
             <!-- CTAs -->
             <div class="hero-ctas animate-fade-in-delay-2">
@@ -84,29 +77,28 @@
               </a>
               <a routerLink="/store" class="btn-modern btn-secondary-modern">
                 <i class="bi bi-shop me-2"></i>
-                Visitar Tienda
+                Tienda
               </a>
             </div>
 
-            <!-- Features desktop -->
-            <div class="hero-features d-none d-lg-flex animate-fade-in-delay-3">
-              <div class="feature-item">
-                <div class="feature-icon">
-                  <i class="bi bi-person-badge-fill"></i>
-                </div>
-                <p class="feature-text">Gestión de<br>Clientes</p>
-              </div>
-              <div class="feature-item">
-                <div class="feature-icon">
-                  <i class="bi bi-gear-fill"></i>
-                </div>
-                <p class="feature-text">Seguimiento<br>de Proyectos</p>
-              </div>
-              <div class="feature-item">
-                <div class="feature-icon">
-                  <i class="bi bi-graph-up-arrow"></i>
-                </div>
-                <p class="feature-text">Análisis en<br>Tiempo Real</p>
+            <!-- 📚 Tutoriales -->
+            <div class="catalogos animate-fade-in-delay-3">
+              <button type="button" class="btn-catalogos" [class.open]="catalogosAbierto"
+                (click)="toggleCatalogos($event)" aria-haspopup="menu" [attr.aria-expanded]="catalogosAbierto">
+                <i class="bi bi-journal-bookmark-fill me-2"></i>
+                Tutoriales
+                <i class="bi bi-chevron-down ms-2 chevron"></i>
+              </button>
+
+              <div class="catalogos-menu" role="menu" *ngIf="catalogosAbierto">
+                <button type="button" class="catalogos-item" role="menuitem" *ngFor="let c of catalogos"
+                  [disabled]="!c.archivo && !c.enlace" (click)="abrirCatalogo(c)">
+                  <i class="bi" [ngClass]="c.icono"></i>
+                  <span>{{ c.nombre }}</span>
+                  <small *ngIf="!c.archivo && !c.enlace">Próximamente</small>
+                  <i *ngIf="c.enlace" class="bi bi-youtube ms-auto"></i>
+                  <i *ngIf="c.archivo && !c.enlace" class="bi bi-download ms-auto"></i>
+                </button>
               </div>
             </div>
 
@@ -142,7 +134,6 @@
         <h2 class="section-title">
           Nuestros <span class="text-gradient">Servicios</span>
         </h2>
-        <p class="section-subtitle">Soluciones tecnológicas de vanguardia</p>
       </div>
 
       <!-- Grid de servicios -->

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { ProductService } from '../../services/warehouse.service';
 import { SalesService } from 'src/app/services/sales.service';
@@ -8,6 +8,7 @@ import Notiflix from "notiflix";
 declare var bootstrap: any;
 import jsPDF from "jspdf";
 import { forkJoin } from 'rxjs';
+import { ProductEditModalComponent } from '../product-edit-modal/product-edit-modal.component';
 
 @Component({
   selector: 'app-inventario',
@@ -15,6 +16,7 @@ import { forkJoin } from 'rxjs';
   styleUrls: ['./inventario.component.scss']
 })
 export class InventarioComponent implements OnInit, OnDestroy {
+  @ViewChild('editModal') editModal!: ProductEditModalComponent;
   public formGroup!: UntypedFormGroup;
   allProducts: any[] = [];
   products: any[] = [];
@@ -22,6 +24,10 @@ export class InventarioComponent implements OnInit, OnDestroy {
   currentPage: number = 1;
   totalPages: number = 0;
   private pageSize: number = 5;
+
+  // ↕️ Orden por columna (PVP o Stock); null = orden normal
+  sortField: 'pvp' | 'stock' | '_margen' | '_margenPct' | null = null;
+  sortDir: 'asc' | 'desc' = 'desc';
   selectedProduct: any;
   isFirstLoad: boolean = true;
   isLoading: boolean = true;
@@ -29,6 +35,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
   selectedCategory: string = "";
   onlyImport: boolean = false;
   onlyLowStock: boolean = false;
+  onlyNoImage: boolean = false;
   categories = [
     'Audio y video',
     'Baquelitas',
@@ -60,7 +67,8 @@ export class InventarioComponent implements OnInit, OnDestroy {
     this.formGroup = this.fb.group({
       searchControl: [''],
       importCheck: [false],
-      lowStockCheck: [false]
+      lowStockCheck: [false],
+      noImageCheck: [false]
     });
     this.getAllProducts();
     this.formGroup.get('searchControl')!.valueChanges
@@ -174,6 +182,12 @@ export class InventarioComponent implements OnInit, OnDestroy {
     this.currentPage = 1; // reinicia paginación al aplicar filtro
     this.applyFilter();
   }
+  toggleNoImage() {
+    this.onlyNoImage = this.formGroup.get('noImageCheck')?.value;
+    this.currentPage = 1;
+    this.applyFilter();
+  }
+
   toggleLowStock() {
     this.onlyLowStock = this.formGroup.get('lowStockCheck')?.value;
     this.currentPage = 1;
@@ -195,11 +209,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
 
     this.productService.getProducts(1, 1000, '', 'descripcion', 'asc').subscribe({
       next: (data: any) => {
-        this.allProducts = (data.items || []).map((p: any) => ({
-          ...p,
-          _normDesc: this.normalizeText(`${p.descripcion ?? ''}`),
-          _normCode: this.normalizeText(`${p.codigo ?? ''}`)
-        }));
+        this.allProducts = (data.items || []).map((p: any) => this.enrichProduct(p));
         this.applyFilter();
 
         if (this.isFirstLoad) {
@@ -217,6 +227,25 @@ export class InventarioComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  /** 1er click: de mayor a menor · 2do: de menor a mayor · 3ro: sin orden. */
+  toggleSort(field: 'pvp' | 'stock' | '_margen' | '_margenPct'): void {
+    if (this.sortField !== field) {
+      this.sortField = field;
+      this.sortDir = 'desc';
+    } else if (this.sortDir === 'desc') {
+      this.sortDir = 'asc';
+    } else {
+      this.sortField = null;
+    }
+    this.currentPage = 1;
+    this.applyFilter();
+  }
+
+  sortIcon(field: 'pvp' | 'stock' | '_margen' | '_margenPct'): string {
+    if (this.sortField !== field) return 'bi-arrow-down-up';
+    return this.sortDir === 'desc' ? 'bi-sort-down' : 'bi-sort-up';
   }
 
   applyFilter(): void {
@@ -240,6 +269,11 @@ export class InventarioComponent implements OnInit, OnDestroy {
       filtered = filtered.filter(p => p.stock < 5);
     }
 
+    // 🔹 Sin imagen
+    if (this.onlyNoImage) {
+      filtered = filtered.filter(p => p.foto === 'NOT-IMAGE');
+    }
+
     // 🔹 Filtro por texto
     if (tokens.length) {
       filtered = filtered
@@ -257,6 +291,17 @@ export class InventarioComponent implements OnInit, OnDestroy {
         .filter(x => x.score >= 0)
         .sort((a, b) => b.score - a.score)
         .map(x => x.p);
+    }
+
+    // 🔹 Orden por PVP o Stock
+    if (this.sortField) {
+      const field = this.sortField;
+      const dir = this.sortDir === 'asc' ? 1 : -1;
+      filtered = [...filtered].sort((a, b) => {
+        // Productos sin margen calculable (sin costo) siempre al final
+        if (a[field] == null || b[field] == null) return (a[field] == null ? 1 : 0) - (b[field] == null ? 1 : 0);
+        return ((Number(a[field]) || 0) - (Number(b[field]) || 0)) * dir;
+      });
     }
 
     // 🔹 Actualiza contador y paginación
@@ -283,12 +328,71 @@ export class InventarioComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Agrega los campos calculados que usan la búsqueda y las columnas de margen. */
+  private enrichProduct(p: any): any {
+    return {
+      ...p,
+      // Margen = PVP − precio de importación (costo); sin costo registrado no se calcula
+      _margen: Number(p.precioImportacion) > 0 ? Number(p.pvp) - Number(p.precioImportacion) : null,
+      _margenPct: Number(p.precioImportacion) > 0
+        ? (Number(p.pvp) - Number(p.precioImportacion)) / Number(p.precioImportacion) * 100
+        : null,
+      _normDesc: this.normalizeText(`${p.descripcion ?? ''}`),
+      _normCode: this.normalizeText(`${p.codigo ?? ''}`)
+    };
+  }
+
+  /** ➕ Abre la ventana vacía para cargar un producto nuevo. */
+  openNewProduct(): void {
+    this.editModal.openNew();
+  }
+
+  /** ✏️ Abre la ventana de edición (desde el botón de la fila). */
+  openEditModal(product: any, event?: Event): void {
+    event?.stopPropagation();
+    this.editModal.open(product);
+  }
+
+  /** ✏️ Desde la ventana de detalle: la cierra y abre la de edición. */
+  editFromDetails(): void {
+    const product = this.selectedProduct;
+    const detailEl = document.getElementById('productModal');
+    const detail = detailEl ? bootstrap.Modal.getInstance(detailEl) : null;
+    if (!product) return;
+    if (!detail || !detailEl) {
+      this.editModal.open(product);
+      return;
+    }
+    detailEl.addEventListener('hidden.bs.modal', () => this.editModal.open(product), { once: true });
+    detail.hide();
+  }
+
+  /** Producto guardado: se actualiza en la lista sin recargar. */
+  onProductSaved(updated: any): void {
+    const idx = this.allProducts.findIndex(p => p.id === updated.id);
+    if (idx !== -1) {
+      this.allProducts[idx] = this.enrichProduct(updated);
+    }
+    if (this.selectedProduct?.id === updated.id) {
+      this.selectedProduct = this.allProducts[idx] ?? updated;
+    }
+    this.applyFilter();
+  }
+
+  /** Producto eliminado: se quita de la lista sin recargar. */
+  onProductDeleted(id: string): void {
+    this.allProducts = this.allProducts.filter(p => p.id !== id);
+    if (this.currentPage > 1 && (this.currentPage - 1) * this.pageSize >= this.allProducts.length) {
+      this.currentPage--;
+    }
+    this.applyFilter();
+  }
+
   openProductModal(product: any): void {
     this.selectedProduct = product;
     const modalElement = document.getElementById('productModal');
     if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
+      bootstrap.Modal.getOrCreateInstance(modalElement).show();
     }
   }
 

@@ -6,13 +6,11 @@ import {AppTranslationLanguageModule} from "../../app-translation-language.modul
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {WAREHOUSE_ROUTES} from "./warehouse.routing";
 import {InventarioComponent} from "./components/inventario/inventario.component";
-import {AddProductComponent} from "./components/add-product/add-product.component";
 import {ExtraProductInfoComponent} from "./components/extra-product-info/extra-product-info.component";
-import {EditProductComponent} from "./components/edit-product/edit-product.component";
+import {ProductEditModalComponent} from "./components/product-edit-modal/product-edit-modal.component";
 
 @NgModule({
   declarations: [
-    AddProductComponent,
     InventarioComponent,
     ExtraProductInfoComponent
   ],
@@ -23,7 +21,7 @@ import {EditProductComponent} from "./components/edit-product/edit-product.compo
     RouterModule.forChild(WAREHOUSE_ROUTES),
     ReactiveFormsModule,
     FormsModule,
-    EditProductComponent,
+    ProductEditModalComponent,
   ]
 })
 export class WarehouseModule {}
