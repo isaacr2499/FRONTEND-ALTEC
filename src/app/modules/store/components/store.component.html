@@ -155,6 +155,20 @@
             </p>
           </div>
 
+          <!-- Ayuda de la búsqueda inteligente -->
+          <div class="search-help" *ngIf="searchedText && (searchSuggestion || searchRelated || totalCount === 0)">
+            <span *ngIf="searchSuggestion">
+              <i class="bi bi-magic me-1"></i>¿Quisiste decir
+              <button type="button" class="link-suggestion" (click)="useSuggestion()">{{ searchSuggestion }}</button>?
+            </span>
+            <span *ngIf="searchRelated" class="related">
+              <i class="bi bi-lightbulb me-1"></i>No encontramos "{{ searchedText }}" exacto; te mostramos productos parecidos.
+            </span>
+            <span *ngIf="totalCount === 0" class="related">
+              <i class="bi bi-search me-1"></i>No encontramos productos para "{{ searchedText }}". Prueba con otra palabra o escríbenos por WhatsApp.
+            </span>
+          </div>
+
           <!-- Buscador -->
           <form class="store-search flex-grow-1" [formGroup]="formGroup" (ngSubmit)="onSubmit()">
             <div class="input-group">
