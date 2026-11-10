@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { SmartSearchCache } from '../../../shared/utils/smart-search';
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 import { ProductService } from "../../warehouse/services/warehouse.service";
@@ -21,6 +22,7 @@ import { ThermalTicketService } from 'src/app/services/thermal-ticket.service';
 })
 export class ProductQuoteComponent implements OnInit {
   public formGroup!: UntypedFormGroup;
+  private smartSearch = new SmartSearchCache<any>(p => [p.descripcion, p.codigo, p.categoria], p => Number(p.stock) > 0);
   allProducts: any[] = [];
   filteredProducts: any[] = [];
   products: any[] = [];
@@ -213,8 +215,6 @@ export class ProductQuoteComponent implements OnInit {
         const items = data?.items ?? [];
         this.allProducts = items.map((p: any) => ({
           ...p,
-          _normDesc: this.normalizeText(`${p.descripcion ?? ''}`),
-          _normCode: this.normalizeText(`${p.codigo ?? ''}`)
         }));
 
         this.applyFilter();
@@ -238,7 +238,6 @@ export class ProductQuoteComponent implements OnInit {
 
   applyFilter(): void {
     const raw = this.formGroup.get('searchControl')!.value || '';
-    const tokens = this.tokenize(raw);
 
     let filtered = this.allProducts;
 
@@ -257,23 +256,9 @@ export class ProductQuoteComponent implements OnInit {
       filtered = filtered.filter(p => p.stock < 5);
     }
 
-    // 🔹 Texto (tu lógica existente)
-    if (tokens.length) {
-      filtered = filtered
-        .map(p => {
-          const normDesc = p._normDesc as string;
-          const normCode = p._normCode as string;
-
-          const matchesAll = tokens.every(t =>
-            this.textContainsToken(normDesc, t) || this.textContainsToken(normCode, t)
-          );
-
-          const score = matchesAll ? this.scoreMatch(normDesc, normCode, tokens) : -1;
-          return {p, score};
-        })
-        .filter(x => x.score >= 0)
-        .sort((a, b) => b.score - a.score)
-        .map(x => x.p);
+    // 🔹 Texto: búsqueda inteligente (tildes, errores de tipeo, sinónimos…)
+    if (raw.trim()) {
+      filtered = this.smartSearch.filter(this.allProducts, filtered, raw).items;
     }
 
     this.filteredProducts = filtered;
@@ -301,75 +286,11 @@ export class ProductQuoteComponent implements OnInit {
 
   /** ---------- Helpers de búsqueda avanzada ---------- */
 
-  /** Normaliza texto eliminando tildes, a minúsculas y colapsa espacios */
-  private normalizeText(text: string): string {
-    return (text || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
 
-  /** Tokeniza en palabras/números */
-  private tokenize(text: string): string[] {
-    const norm = this.normalizeText(text);
-    return norm.match(/[a-z0-9]+/gi)?.map(t => this.normalizeText(t)) ?? [];
-  }
 
-  /** "Stem" muy ligero para plural/singular comunes (es, s) */
-  private stem(token: string): string {
-    return token.replace(/(es|s)$/i, '');
-  }
 
-  /** Escapa un token para expresiones regulares */
-  private escapeRegExp(s: string): string {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
 
-  /** ¿El texto contiene el token? Acepta coincidencia directa, raíz y bordes de palabra */
-  private textContainsToken(text: string, token: string): boolean {
-    if (!text || !token) return false;
-    const t = this.escapeRegExp(token);
-    const stemmed = this.escapeRegExp(this.stem(token));
 
-    return (
-      text.includes(token) ||
-      (stemmed && text.includes(stemmed)) ||
-      new RegExp(`\\b${t}`, 'i').test(text) ||
-      new RegExp(`${t}\\b`, 'i').test(text)
-    );
-  }
-
-  /** Puntaje de relevancia para ordenar resultados */
-  private scoreMatch(normDesc: string, normCode: string, tokens: string[]): number {
-    let score = 0;
-
-    for (const t of tokens) {
-      const inCode = this.textContainsToken(normCode, t);
-      const inDesc = this.textContainsToken(normDesc, t);
-
-      if (inCode) score += 10;               // código pesa más
-      if (inDesc) score += 4;
-
-      // Bonus por palabra completa
-      const tEsc = this.escapeRegExp(t);
-      if (new RegExp(`\\b${tEsc}\\b`).test(normDesc)) score += 2;
-      if (new RegExp(`\\b${tEsc}\\b`).test(normCode)) score += 4;
-
-      // Bonus si comienza con el token
-      if (normDesc.startsWith(t)) score += 2;
-      if (normCode.startsWith(t)) score += 3;
-    }
-
-    // Bonus si TODOS los tokens están dentro de la misma cadena (proximidad simple)
-    const allInDesc = tokens.every(t => this.textContainsToken(normDesc, t));
-    const allInCode = tokens.every(t => this.textContainsToken(normCode, t));
-    if (allInDesc) score += 5;
-    if (allInCode) score += 8;
-
-    return score;
-  }
 
   /** ---------- Cotización / PDF (tu lógica intacta) ---------- */
 

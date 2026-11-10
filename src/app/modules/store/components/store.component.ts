@@ -7,6 +7,7 @@ import { LoaderComponent } from "../../../shared/components/LoaderComponent";
 import Notiflix from "notiflix";
 import { CartService } from "../../../shared/services/CartService";
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { SmartSearch } from '../../../shared/utils/smart-search';
 
 
 @Component({
@@ -35,6 +36,12 @@ export class StoreComponent implements OnInit {
   totalPages = 0;
   pageSize = 12;
   searchTerm = '';
+
+  // Búsqueda inteligente (tildes, errores de tipeo, sinónimos…)
+  private searchEngine: SmartSearch<any> | null = null;
+  searchSuggestion: string | null = null;  // "¿Quisiste decir…?"
+  searchRelated = false;                   // no hubo coincidencia exacta: se muestran parecidos
+  searchedText = '';
   selectedProduct: any = null;
   selectedValue: string = '';
 
@@ -241,12 +248,12 @@ export class StoreComponent implements OnInit {
       next: (data: any) => {
         const items = Array.isArray(data) ? data : data?.items ?? [];
 
-        this.allProducts = items.map((p: any) => ({
-          ...p,
-          cantidad: 1,
-          _normDesc: this.normalizeText(`${p.descripcion ?? ''}`),
-          _normCode: this.normalizeText(`${p.codigo ?? ''}`)
-        }));
+        this.allProducts = items.map((p: any) => ({ ...p, cantidad: 1 }));
+        this.searchEngine = new SmartSearch<any>(
+          this.allProducts,
+          p => [p.descripcion, p.codigo, p.categoria],
+          p => !this.isOutOfStock(p)
+        );
 
         this.applyFilter();
         this.loaderService.finish();
@@ -286,27 +293,17 @@ export class StoreComponent implements OnInit {
 
 
   applyFilter(): void {
-    const raw = this.formGroup.get('searchTerm')!.value || '';
-    const tokens = this.tokenize(raw);
+    const raw = (this.formGroup.get('searchTerm')!.value || '').trim();
     let filtered = this.allProducts;
+    this.searchSuggestion = null;
+    this.searchRelated = false;
+    this.searchedText = raw;
 
-
-    if (tokens.length) {
-      filtered = this.allProducts
-        .map(p => {
-          const normDesc = p._normDesc as string;
-          const normCode = p._normCode as string;
-
-          const matchesAll = tokens.every(t =>
-            this.textContainsToken(normDesc, t) || this.textContainsToken(normCode, t)
-          );
-
-          const score = matchesAll ? this.scoreMatch(normDesc, normCode, tokens) : -1;
-          return { p, score };
-        })
-        .filter(x => x.score >= 0)
-        .sort((a, b) => b.score - a.score)
-        .map(x => x.p);
+    if (raw && this.searchEngine) {
+      const result = this.searchEngine.search(raw);
+      filtered = result.items;
+      this.searchRelated = result.related;
+      this.searchSuggestion = result.suggestion;
     }
 
     if (this.selectedCategories.length > 0) {
@@ -318,62 +315,14 @@ export class StoreComponent implements OnInit {
     this.products = filtered.slice(startIndex, startIndex + this.pageSize);
   }
 
-  private normalizeText(text: string): string {
-    return (text || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/\s+/g, ' ')
-      .trim();
+  /** Aplica la búsqueda corregida de "¿Quisiste decir…?". */
+  useSuggestion(): void {
+    if (!this.searchSuggestion) return;
+    this.formGroup.get('searchTerm')?.setValue(this.searchSuggestion);
+    this.currentPage = 1;
+    this.applyFilter();
   }
 
-  private tokenize(text: string): string[] {
-    const norm = this.normalizeText(text);
-    return norm.match(/[a-z0-9]+/gi)?.map(t => this.normalizeText(t)) ?? [];
-  }
-  private stem(token: string): string {
-    return token.replace(/(es|s)$/i, '');
-  }
-  private escapeRegExp(s: string): string {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-  private textContainsToken(text: string, token: string): boolean {
-    if (!text || !token) return false;
-    const t = this.escapeRegExp(token);
-    const stemmed = this.escapeRegExp(this.stem(token));
-
-    return (
-      text.includes(token) ||
-      (stemmed && text.includes(stemmed)) ||
-      new RegExp(`\\b${t}`, 'i').test(text) ||
-      new RegExp(`${t}\\b`, 'i').test(text)
-    );
-  }
-
-  private scoreMatch(normDesc: string, normCode: string, tokens: string[]): number {
-    let score = 0;
-
-    for (const t of tokens) {
-      const inCode = this.textContainsToken(normCode, t);
-      const inDesc = this.textContainsToken(normDesc, t);
-
-      if (inCode) score += 10;
-      if (inDesc) score += 4;
-
-      const tEsc = this.escapeRegExp(t);
-      if (new RegExp(`\\b${tEsc}\\b`).test(normDesc)) score += 2;
-      if (new RegExp(`\\b${tEsc}\\b`).test(normCode)) score += 4;
-
-      if (normDesc.startsWith(t)) score += 2;
-      if (normCode.startsWith(t)) score += 3;
-    }
-    const allInDesc = tokens.every(t => this.textContainsToken(normDesc, t));
-    const allInCode = tokens.every(t => this.textContainsToken(normCode, t));
-    if (allInDesc) score += 5;
-    if (allInCode) score += 8;
-
-    return score;
-  }
   onSearchChange(): void {
     this.currentPage = 1;
     this.applyFilter();

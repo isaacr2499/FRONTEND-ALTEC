@@ -3,15 +3,16 @@
 
     <!-- ── HEADER ── -->
     <div class="page-header mb-4">
-      <div class="header-icon"><i class="bi bi-file-earmark-spreadsheet-fill"></i></div>
-      <h1 class="page-title">Historial de Importaciones</h1>
-      <p class="page-subtitle">Sube tus importaciones en Excel y consúltalas cuando quieras</p>
+      <h1 class="page-title">
+        <i class="bi bi-file-earmark-spreadsheet me-2"></i>
+        Historial de Importaciones
+      </h1>
     </div>
 
     <div class="row g-4">
 
       <!-- ── SUBIR EXCEL ── -->
-      <div class="col-12 col-xl-4">
+      <div class="col-12 col-xl-3">
         <form class="form-card" [formGroup]="uploadForm" (ngSubmit)="upload()" autocomplete="off">
           <h2 class="card-title"><i class="bi bi-cloud-arrow-up me-2"></i>Nueva importación</h2>
 
@@ -62,7 +63,7 @@
       </div>
 
       <!-- ── LISTA ── -->
-      <div class="col-12 col-xl-8">
+      <div class="col-12 col-xl-9">
         <div class="form-card">
 
           <!-- KPIs -->
@@ -76,8 +77,12 @@
               <span class="kpi-value">{{ totalProductos }}</span>
             </div>
             <div class="kpi">
-              <span class="kpi-label">Monto total</span>
+              <span class="kpi-label">Costo en China</span>
               <span class="kpi-value gold">{{ totalMonto | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi-label">Costos extras</span>
+              <span class="kpi-value extra">{{ totalExtras | currency:'USD':'symbol':'1.2-2' }}</span>
             </div>
           </div>
 
@@ -88,16 +93,8 @@
               <input type="text" class="field-input with-icon" placeholder="Buscar por nombre o archivo..."
                      [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)">
             </div>
-            <div class="date-filter">
-              <label>Desde</label>
-              <input type="date" class="field-input" [(ngModel)]="startDate" (change)="loadQuotations()">
-            </div>
-            <div class="date-filter">
-              <label>Hasta</label>
-              <input type="date" class="field-input" [(ngModel)]="endDate" (change)="loadQuotations()">
-            </div>
             <button type="button" class="btn-ghost" (click)="clearFilters()"
-                    *ngIf="searchTerm || startDate || endDate">
+                    *ngIf="searchTerm">
               <i class="bi bi-x-circle me-1"></i>Limpiar
             </button>
           </div>
@@ -109,7 +106,7 @@
 
           <div class="state-box" *ngIf="!isLoading && quotations.length === 0">
             <i class="bi bi-inbox"></i>
-            <span>{{ (searchTerm || startDate || endDate) ? 'No hay importaciones con esos filtros' : 'Aún no has subido importaciones' }}</span>
+            <span>{{ searchTerm ? 'No hay importaciones con esa búsqueda' : 'Aún no has subido importaciones' }}</span>
           </div>
 
           <!-- Tabla -->
@@ -120,8 +117,8 @@
                   <th>Fecha</th>
                   <th>Nombre</th>
                   <th class="text-center">Productos</th>
-                  <th class="text-end">Total</th>
-                  <th>Subido por</th>
+                  <th class="text-end">Costo China</th>
+                  <th class="text-end">Costos extras</th>
                   <th class="text-center">Acciones</th>
                 </tr>
               </thead>
@@ -130,23 +127,31 @@
                   <td class="nowrap">{{ dateOnly(q.fecha) | date:'dd/MM/yyyy' }}</td>
                   <td>
                     <span class="q-name">{{ q.nombre }}</span>
-                    <span class="q-file">{{ q.nombreArchivo }} · {{ formatSize(q.tamanoBytes) }}</span>
+                    <span class="q-file">{{ q.nombreArchivo }} · {{ formatSize(q.tamanoBytes) }} · <i class="bi bi-person"></i> {{ q.createdBy }}</span>
                   </td>
                   <td class="text-center">{{ q.totalItems }}</td>
                   <td class="text-end gold nowrap">{{ q.totalMonto | currency:'USD':'symbol':'1.2-2' }}</td>
-                  <td class="muted nowrap">{{ q.createdBy }}</td>
+                  <td class="text-end nowrap">
+                    <span *ngIf="q.costosExtras" class="extra-amount" [title]="q.costosExtrasNota || ''">
+                      {{ q.costosExtras | currency:'USD':'symbol':'1.2-2' }}
+                      <small class="extra-pct" *ngIf="q.totalMonto">+{{ (q.costosExtras / q.totalMonto * 100) | number:'1.0-1' }}%</small>
+                    </span>
+                    <span *ngIf="!q.costosExtras" class="muted">—</span>
+                  </td>
                   <td class="text-center nowrap">
-                    <button type="button" class="btn-view me-2" (click)="$event.stopPropagation(); openDetail(q)"
+                    <button type="button" class="btn-extra me-2" (click)="$event.stopPropagation(); openCosts(q)"
+                            [title]="q.costosExtras ? 'Editar costos extras de importación' : 'Agregar costos extras de importación'">
+                      <i class="bi" [ngClass]="q.costosExtras ? 'bi-pencil' : 'bi-plus-lg'"></i>
+                    </button>
+                    <button type="button" class="btn-view btn-icon me-2" (click)="$event.stopPropagation(); openDetail(q)"
                             [disabled]="loadingDetailId === q.id" title="Ver productos">
                       <span *ngIf="loadingDetailId === q.id" class="spinner-border spinner-border-sm"></span>
                       <i *ngIf="loadingDetailId !== q.id" class="bi bi-eye"></i>
-                      <span class="d-none d-md-inline ms-1">Ver</span>
                     </button>
-                    <button type="button" class="btn-download" (click)="$event.stopPropagation(); download(q)"
+                    <button type="button" class="btn-download btn-icon" (click)="$event.stopPropagation(); download(q)"
                             [disabled]="downloadingId === q.id" title="Descargar Excel original">
                       <span *ngIf="downloadingId === q.id" class="spinner-border spinner-border-sm"></span>
                       <i *ngIf="downloadingId !== q.id" class="bi bi-download"></i>
-                      <span class="d-none d-md-inline ms-1">Descargar</span>
                     </button>
                   </td>
                 </tr>
@@ -188,8 +193,16 @@
           <span class="kpi-value">{{ filteredItemsQty | number:'1.0-2' }}</span>
         </div>
         <div class="kpi">
-          <span class="kpi-label">{{ itemSearch ? 'Total filtrado' : 'Total' }}</span>
+          <span class="kpi-label">{{ itemSearch ? 'China (filtrado)' : 'Costo en China' }}</span>
           <span class="kpi-value gold">{{ filteredItemsTotal | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">{{ itemSearch ? 'Ecuador (filtrado)' : 'Costo en Ecuador' }}</span>
+          <span class="kpi-value extra">{{ filteredItemsTotalEcuador | currency:'USD':'symbol':'1.2-2' }}</span>
+          <small class="kpi-hint" *ngIf="selectedDetail.costosExtras">
+            +{{ selectedDetail.costosExtras | currency:'USD':'symbol':'1.2-2' }} extras · recargo {{ selectedDetail.porcentajeRecargo | number:'1.0-2' }}%
+          </small>
+          <small class="kpi-hint" *ngIf="!selectedDetail.costosExtras">Sin costos extras registrados</small>
         </div>
       </div>
 
@@ -199,6 +212,10 @@
           <input type="text" class="field-input with-icon" placeholder="Buscar producto..."
                  [(ngModel)]="itemSearch">
         </div>
+        <button type="button" class="btn-extra-text" (click)="openCosts(selectedDetail)">
+          <i class="bi" [ngClass]="selectedDetail.costosExtras ? 'bi-pencil' : 'bi-plus-lg'"></i>
+          <span class="ms-1">Costos extras</span>
+        </button>
         <button type="button" class="btn-download" (click)="download(selectedDetail)"
                 [disabled]="downloadingId === selectedDetail.id">
           <span *ngIf="downloadingId === selectedDetail.id" class="spinner-border spinner-border-sm"></span>
@@ -212,27 +229,277 @@
           <thead>
             <tr>
               <th class="text-center">#</th>
+              <th class="text-center col-photo">Foto</th>
               <th>Producto</th>
               <th class="text-end">Cantidad</th>
-              <th class="text-end">Precio unit.</th>
-              <th class="text-end">Total</th>
+              <th class="text-end">Costo en China</th>
+              <th class="text-end col-ecuador">Costo en Ecuador</th>
+              <th class="text-end">Total China</th>
+              <th class="text-end">Total Ecuador</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of filteredItems; let i = index; trackBy: trackByFila">
               <td class="text-center muted">{{ i + 1 }}</td>
+              <td class="text-center col-photo">
+                <ng-container *ngTemplateOutlet="photoCell; context: { fila: item.fila }"></ng-container>
+              </td>
               <td>{{ item.producto }}</td>
               <td class="text-end nowrap">{{ item.cantidad | number:'1.0-2' }}</td>
               <td class="text-end nowrap">{{ item.precioUnitario | currency:'USD':'symbol':'1.2-4' }}</td>
+              <td class="text-end nowrap ecuador col-ecuador">{{ item.costoEcuadorUnitario | currency:'USD':'symbol':'1.2-2' }}</td>
               <td class="text-end gold nowrap">{{ item.total | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td class="text-end nowrap ecuador">{{ item.costoEcuadorTotal | currency:'USD':'symbol':'1.2-2' }}</td>
             </tr>
             <tr *ngIf="filteredItems.length === 0">
-              <td colspan="5" class="text-center muted py-4">No hay productos que coincidan con "{{ itemSearch }}"</td>
+              <td colspan="8" class="text-center muted py-4">No hay productos que coincidan con "{{ itemSearch }}"</td>
             </tr>
           </tbody>
         </table>
       </div>
 
+      <!-- Proyección de ganancias -->
+      <div class="detail-footer">
+        <button type="button" class="btn-projection" (click)="openProjection()">
+          <i class="bi bi-graph-up-arrow me-2"></i>Ver métricas y proyección de ganancias
+        </button>
+      </div>
+
     </div>
+  </div>
+  <!-- ── PROYECCIÓN DE GANANCIAS ── -->
+  <div class="detail-backdrop projection-backdrop" *ngIf="showProjection && selectedDetail" (click)="closeProjection()">
+    <div class="projection-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+
+      <div class="detail-header">
+        <div class="detail-title-wrap">
+          <h2 class="detail-title"><i class="bi bi-graph-up-arrow me-2"></i>Métricas y proyección de ganancias</h2>
+          <span class="detail-meta">
+            {{ selectedDetail.nombre }} · simulación de PVP sobre el costo en Ecuador (no cambia precios de la bodega)
+          </span>
+        </div>
+        <div class="proj-file-actions">
+          <button type="button" class="btn-download" (click)="exportProjectionPdf()" title="Descarga el PDF con tus márgenes; luego puedes volver a cargarlo">
+            <i class="bi bi-file-earmark-pdf me-1"></i>Descargar PDF
+          </button>
+          <button type="button" class="btn-view" (click)="projFile.click()" title="Carga un PDF de proyección descargado antes">
+            <i class="bi bi-upload me-1"></i>Cargar PDF
+          </button>
+          <input #projFile type="file" accept="application/pdf,.pdf" hidden (change)="onProjectionFileSelected($event)">
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeProjection()" title="Volver al detalle">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-row">
+        <div class="kpi">
+          <span class="kpi-label">Inversión (costo en Ecuador)</span>
+          <span class="kpi-value extra">{{ projInversion | currency:'USD':'symbol':'1.2-2' }}</span>
+          <small class="kpi-hint" *ngIf="!selectedDetail.costosExtras">Sin costos extras: es solo el costo en China</small>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Si vendes todo</span>
+          <span class="kpi-value">{{ projVentas | currency:'USD':'symbol':'1.2-2' }}</span>
+          <small class="kpi-hint">{{ filteredItemsQtyAll | number:'1.0-0' }} unidades</small>
+        </div>
+        <div class="kpi kpi-profit">
+          <span class="kpi-label">Ganancia proyectada</span>
+          <span class="kpi-value gold">{{ projGanancia | currency:'USD':'symbol':'1.2-2' }}</span>
+          <small class="kpi-hint">Retorno {{ projRetorno | number:'1.0-1' }}% sobre lo invertido</small>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Margen sobre ventas</span>
+          <span class="kpi-value">{{ projMargenVentas | number:'1.0-1' }}%</span>
+          <small class="kpi-hint">De cada $1 vendido, {{ (projMargenVentas / 100) | currency:'USD':'symbol':'1.2-2' }} es ganancia</small>
+        </div>
+      </div>
+
+      <!-- Controles: margen general y redondeo -->
+      <div class="proj-controls">
+        <div class="proj-control">
+          <label class="field-label">Margen general (sobre el costo)</label>
+          <div class="proj-margin-input">
+            <input type="number" class="field-input" min="0" step="1"
+                   [ngModel]="projGlobalMargin" (ngModelChange)="setGlobalMargin($event)">
+            <span class="suffix">%</span>
+          </div>
+          <div class="proj-presets">
+            <button type="button" *ngFor="let m of projMarginPresets" class="preset"
+                    [class.active]="projGlobalMargin === m" (click)="setGlobalMargin(m)">{{ m }}%</button>
+          </div>
+        </div>
+
+        <div class="proj-control">
+          <label class="field-label">Redondear PVP hacia arriba</label>
+          <select class="field-input" [(ngModel)]="projRounding" (ngModelChange)="setGlobalMargin(projGlobalMargin)">
+            <option *ngFor="let o of projRoundingOptions" [ngValue]="o.value">{{ o.label }}</option>
+          </select>
+        </div>
+
+        <div class="proj-control proj-actions">
+          <span class="proj-custom" *ngIf="projCustomCount">
+            <i class="bi bi-sliders me-1"></i>{{ projCustomCount }} producto(s) con margen propio
+          </span>
+          <button type="button" class="btn-ghost" (click)="applyGlobalToAll()" [disabled]="!projCustomCount">
+            <i class="bi bi-arrow-repeat me-1"></i>Aplicar {{ projGlobalMargin }}% a todos
+          </button>
+        </div>
+      </div>
+
+      <!-- Top 5 -->
+      <div class="proj-top" *ngIf="projGanancia > 0">
+        <span class="proj-top-title"><i class="bi bi-trophy me-1"></i>Los que más ganancia dejan</span>
+        <div class="proj-top-item" *ngFor="let r of projTop">
+          <span class="name" [title]="r.producto">{{ r.producto }}</span>
+          <div class="bar"><div class="fill" [style.width.%]="rowShare(r)"></div></div>
+          <span class="value">{{ rowProfitTotal(r) | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Búsqueda y orden -->
+      <div class="filters">
+        <div class="input-icon-wrap flex-grow-1">
+          <i class="bi bi-search input-icon"></i>
+          <input type="text" class="field-input with-icon" placeholder="Buscar producto..." [(ngModel)]="projSearch">
+        </div>
+        <select class="field-input proj-sort" [(ngModel)]="projSort">
+          <option value="fila">Orden del Excel</option>
+          <option value="ganancia">Mayor ganancia</option>
+          <option value="margen">Mayor margen</option>
+        </select>
+      </div>
+
+      <!-- Tabla editable -->
+      <div class="detail-table-wrap">
+        <table class="history-table proj-table">
+          <thead>
+            <tr>
+              <th class="text-center col-photo">Foto</th>
+              <th>Producto</th>
+              <th class="text-end">Cant.</th>
+              <th class="text-end col-ecuador">Costo Ecuador</th>
+              <th class="text-center">Margen %</th>
+              <th class="text-end">PVP simulado</th>
+              <th class="text-end">Ganancia unit.</th>
+              <th class="text-end">Ganancia total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of projVisibleRows; trackBy: trackByProjFila" [class.custom]="r.margen !== null">
+              <td class="text-center col-photo">
+                <ng-container *ngTemplateOutlet="photoCell; context: { fila: r.fila }"></ng-container>
+              </td>
+              <td>{{ r.producto }}</td>
+              <td class="text-end nowrap">{{ r.cantidad | number:'1.0-2' }}</td>
+              <td class="text-end nowrap ecuador col-ecuador">{{ r.costo | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td class="text-center nowrap">
+                <div class="cell-input">
+                  <input type="number" step="1" [placeholder]="projGlobalMargin"
+                         [ngModel]="r.margen" (ngModelChange)="setRowMargin(r, $event)"
+                         [title]="r.margen === null ? 'Usa el margen general (' + projGlobalMargin + '%)' : 'Margen propio de este producto'">
+                  <button type="button" class="cell-reset" *ngIf="r.margen !== null" (click)="resetRowMargin(r)"
+                          title="Volver al margen general"><i class="bi bi-x"></i></button>
+                </div>
+              </td>
+              <td class="text-end nowrap">
+                <div class="cell-input pvp">
+                  <span>$</span>
+                  <input type="number" step="0.01" min="0" [ngModel]="rowPvpInput(r)"
+                         (change)="setRowPvp(r, $any($event.target).value)" title="Escribe un PVP y se calcula su margen">
+                </div>
+              </td>
+              <td class="text-end nowrap" [class.negative]="rowProfitUnit(r) < 0">{{ rowProfitUnit(r) | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td class="text-end nowrap gold" [class.negative]="rowProfitTotal(r) < 0">{{ rowProfitTotal(r) | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+            <tr *ngIf="projVisibleRows.length === 0">
+              <td colspan="8" class="text-center muted py-4">No hay productos que coincidan con "{{ projSearch }}"</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3"><strong>Total</strong></td>
+              <td class="text-end nowrap ecuador col-ecuador">{{ projInversion | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td class="text-center nowrap">{{ projRetorno | number:'1.0-1' }}%</td>
+              <td class="text-end nowrap">{{ projVentas | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td></td>
+              <td class="text-end nowrap gold">{{ projGanancia | currency:'USD':'symbol':'1.2-2' }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <p class="proj-note">
+        <i class="bi bi-info-circle me-1"></i>
+        Es una simulación: los márgenes se recuerdan en este navegador y no cambian los precios de la bodega.
+        Para guardarla en otro lado o usarla en otro equipo, usa <strong>Descargar PDF</strong> y luego <strong>Cargar PDF</strong>.
+        El margen es sobre el costo en Ecuador (PVP = costo × (1 + margen)). Si cambias los costos extras, todo se recalcula.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── MODAL COSTOS EXTRAS ── -->
+  <div class="detail-backdrop costs-backdrop" *ngIf="costsTarget" (click)="closeCosts()">
+    <div class="costs-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="detail-header">
+        <div class="detail-title-wrap">
+          <h2 class="detail-title"><i class="bi bi-cash-coin me-2"></i>Costos extras de importación</h2>
+          <span class="detail-meta">{{ costsTarget.nombre }}</span>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeCosts()" title="Cerrar">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <p class="costs-help">
+        Es todo lo que pagaste además del precio en China para que la mercadería llegue:
+        <strong>aduanas, IVA, comisión de Alibaba, impuesto TC</strong>, flete local o cualquier otro gasto.
+        ALTEC lo reparte entre los productos según su valor para darte el <strong>costo real en Ecuador</strong>.
+      </p>
+
+      <label class="field-label">Monto total de costos extras</label>
+      <div class="input-icon-wrap">
+        <span class="input-icon money">$</span>
+        <input type="number" class="field-input with-icon" min="0" step="0.01" placeholder="0.00"
+               [(ngModel)]="costsAmount" (keydown.enter)="saveCosts()" autofocus>
+      </div>
+
+      <label class="field-label mt-3">Detalle (opcional)</label>
+      <input type="text" class="field-input" maxlength="300"
+             placeholder="Ej: Aduana $180 + IVA $90 + Alibaba $30" [(ngModel)]="costsNote">
+
+      <div class="costs-preview">
+        <span>Costo en China <strong>{{ costsTarget.totalMonto | currency:'USD':'symbol':'1.2-2' }}</strong></span>
+        <span>+ extras <strong>{{ (costsAmount || 0) | currency:'USD':'symbol':'1.2-2' }}</strong></span>
+        <span>= Ecuador <strong class="ecuador">{{ costsTarget.totalMonto + (costsAmount || 0) | currency:'USD':'symbol':'1.2-2' }}</strong></span>
+        <span class="costs-pct">Recargo por producto: {{ costsPreviewPct | number:'1.0-2' }}%</span>
+      </div>
+
+      <div class="costs-actions">
+        <button type="button" class="btn-ghost" (click)="closeCosts()" [disabled]="isSavingCosts">Cancelar</button>
+        <button type="button" class="btn-primary-action w-auto" (click)="saveCosts()" [disabled]="isSavingCosts">
+          <span *ngIf="isSavingCosts" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!isSavingCosts" class="bi bi-check-circle-fill me-2"></i>
+          {{ isSavingCosts ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Foto de la fila (miniatura que se amplía al hacer click) -->
+  <ng-template #photoCell let-fila="fila">
+    <button type="button" class="photo-thumb" *ngIf="photoUrl(fila) as url; else noPhoto"
+            (click)="openZoom(fila, $event)" title="Ver foto">
+      <img [src]="url" alt="Foto del producto" loading="lazy" (error)="onPhotoError(fila)">
+    </button>
+    <ng-template #noPhoto><span class="photo-empty"><i class="bi bi-image"></i></span></ng-template>
+  </ng-template>
+
+  <!-- Foto ampliada -->
+  <div class="detail-backdrop zoom-backdrop" *ngIf="zoomImage" (click)="zoomImage = null">
+    <img class="zoom-img" [src]="zoomImage" alt="Foto del producto" (click)="$event.stopPropagation()">
+    <button type="button" class="btn-close-modal zoom-close" (click)="zoomImage = null" title="Cerrar">
+      <i class="bi bi-x-lg"></i>
+    </button>
   </div>
 </div>

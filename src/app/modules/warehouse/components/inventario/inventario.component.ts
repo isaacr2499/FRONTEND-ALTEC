@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { SmartSearchCache } from '../../../../shared/utils/smart-search';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { ProductService } from '../../services/warehouse.service';
 import { SalesService } from 'src/app/services/sales.service';
@@ -18,6 +19,7 @@ import { ProductEditModalComponent } from '../product-edit-modal/product-edit-mo
 export class InventarioComponent implements OnInit, OnDestroy {
   @ViewChild('editModal') editModal!: ProductEditModalComponent;
   public formGroup!: UntypedFormGroup;
+  private smartSearch = new SmartSearchCache<any>(p => [p.descripcion, p.codigo, p.categoria], p => Number(p.stock) > 0);
   allProducts: any[] = [];
   products: any[] = [];
   totalCount: number = 0;
@@ -250,7 +252,6 @@ export class InventarioComponent implements OnInit, OnDestroy {
 
   applyFilter(): void {
     const raw = this.formGroup.get('searchControl')!.value || '';
-    const tokens = this.tokenize(raw);
 
     let filtered = this.allProducts;
 
@@ -274,23 +275,9 @@ export class InventarioComponent implements OnInit, OnDestroy {
       filtered = filtered.filter(p => p.foto === 'NOT-IMAGE');
     }
 
-    // 🔹 Filtro por texto
-    if (tokens.length) {
-      filtered = filtered
-        .map(p => {
-          const normDesc = p._normDesc as string;
-          const normCode = p._normCode as string;
-
-          const matchesAll = tokens.every(t =>
-            this.textContainsToken(normDesc, t) || this.textContainsToken(normCode, t)
-          );
-
-          const score = matchesAll ? this.scoreMatch(normDesc, normCode, tokens) : -1;
-          return { p, score };
-        })
-        .filter(x => x.score >= 0)
-        .sort((a, b) => b.score - a.score)
-        .map(x => x.p);
+    // 🔹 Texto: búsqueda inteligente (tildes, errores de tipeo, sinónimos…)
+    if (raw.trim()) {
+      filtered = this.smartSearch.filter(this.allProducts, filtered, raw).items;
     }
 
     // 🔹 Orden por PVP o Stock
@@ -337,8 +324,6 @@ export class InventarioComponent implements OnInit, OnDestroy {
       _margenPct: Number(p.precioImportacion) > 0
         ? (Number(p.pvp) - Number(p.precioImportacion)) / Number(p.precioImportacion) * 100
         : null,
-      _normDesc: this.normalizeText(`${p.descripcion ?? ''}`),
-      _normCode: this.normalizeText(`${p.codigo ?? ''}`)
     };
   }
 
@@ -372,6 +357,7 @@ export class InventarioComponent implements OnInit, OnDestroy {
     const idx = this.allProducts.findIndex(p => p.id === updated.id);
     if (idx !== -1) {
       this.allProducts[idx] = this.enrichProduct(updated);
+      this.smartSearch.invalidate();
     }
     if (this.selectedProduct?.id === updated.id) {
       this.selectedProduct = this.allProducts[idx] ?? updated;
@@ -396,63 +382,10 @@ export class InventarioComponent implements OnInit, OnDestroy {
     }
   }
 
-  private normalizeText(text: string): string {
-    return (text || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
 
-  private tokenize(text: string): string[] {
-    const norm = this.normalizeText(text);
-    return norm.match(/[a-z0-9]+/gi)?.map(t => this.normalizeText(t)) ?? [];
-  }
 
-  private stem(token: string): string {
-    return token.replace(/(es|s)$/i, '');
-  }
 
-  private escapeRegExp(s: string): string {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
 
-  private textContainsToken(text: string, token: string): boolean {
-    if (!text || !token) return false;
-    const t = this.escapeRegExp(token);
-    const stemmed = this.escapeRegExp(this.stem(token));
-
-    return (
-      text.includes(token) ||
-      (stemmed && text.includes(stemmed)) ||
-      new RegExp(`\\b${t}`, 'i').test(text) ||
-      new RegExp(`${t}\\b`, 'i').test(text)
-    );
-  }
-  private scoreMatch(normDesc: string, normCode: string, tokens: string[]): number {
-    let score = 0;
-
-    for (const t of tokens) {
-      const inCode = this.textContainsToken(normCode, t);
-      const inDesc = this.textContainsToken(normDesc, t);
-
-      if (inCode) score += 10;
-      if (inDesc) score += 4;
-
-      const tEsc = this.escapeRegExp(t);
-      if (new RegExp(`\\b${tEsc}\\b`).test(normDesc)) score += 2;
-      if (new RegExp(`\\b${tEsc}\\b`).test(normCode)) score += 4;
-      if (normDesc.startsWith(t)) score += 2;
-      if (normCode.startsWith(t)) score += 3;
-    }
-    const allInDesc = tokens.every(t => this.textContainsToken(normDesc, t));
-    const allInCode = tokens.every(t => this.textContainsToken(normCode, t));
-    if (allInDesc) score += 5;
-    if (allInCode) score += 8;
-
-    return score;
-  }
 
   onSubmit() { }
   async descargarPDF() {

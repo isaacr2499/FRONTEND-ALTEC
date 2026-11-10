@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SmartSearchCache } from '../../../shared/utils/smart-search';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -49,6 +50,7 @@ interface PaymentMethod {
   styleUrls: ['./sales-module.component.scss']
 })
 export class SalesModuleComponent implements OnInit {
+  private smartSearch = new SmartSearchCache<any>(p => [p.descripcion, p.codigo, p.categoria], p => Number(p.stock) > 0);
 
   formGroup!: FormGroup;
 
@@ -344,88 +346,22 @@ export class SalesModuleComponent implements OnInit {
 
   applyFilter(value: any): void {
     const raw = this.formGroup.get('searchControl')!.value || '';
-    const tokens = this.tokenize(raw);
 
-    let filtered = this.allProducts;
-
-    if (!tokens.length) {
+    if (!raw.trim()) {
       this.showDefaultProducts();
       return;
     }
 
-    filtered = filtered
-      .map(p => {
-        const normDesc = this.normalizeText(p.descripcion ?? '');
-        const normCode = this.normalizeText(p.codigo ?? '');
-
-        const matchesAll = tokens.every((t: any) =>
-          this.textContainsToken(normDesc, t) ||
-          this.textContainsToken(normCode, t)
-        );
-
-        const score = matchesAll
-          ? this.scoreMatch(normDesc, normCode, tokens)
-          : -1;
-
-        return { p, score };
-      })
-      .filter(x => x.score >= 0)
-      .sort((a, b) => b.score - a.score)
-      .map(x => x.p);
-
+    // Búsqueda inteligente: tildes, errores de tipeo, palabras pegadas y sinónimos
+    const filtered = this.smartSearch.filter(this.allProducts, this.allProducts, raw).items;
     this.products = filtered.slice(0, this.MAX_RESULTS);
   }
 
-  private normalizeText(text: string): string {
-    return (text || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
 
-  private tokenize(text: string): string[] {
-    const norm = this.normalizeText(text);
-    return norm.match(/[a-z0-9]+/gi)?.map(t => this.normalizeText(t)) ?? [];
-  }
 
-  private stem(token: string): string {
-    return token.replace(/(es|s)$/i, '');
-  }
 
-  private escapeRegExp(s: string): string {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
 
-  private textContainsToken(text: string, token: string): boolean {
-    if (!text || !token) return false;
-    const t = this.escapeRegExp(token);
-    const stemmed = this.escapeRegExp(this.stem(token));
 
-    return (
-      text.includes(token) ||
-      (stemmed && text.includes(stemmed)) ||
-      new RegExp(`\\b${t}`, 'i').test(text) ||
-      new RegExp(`${t}\\b`, 'i').test(text)
-    );
-  }
-
-  private scoreMatch(normDesc: string, normCode: string, tokens: string[]): number {
-    let score = 0;
-
-    for (const t of tokens) {
-      const inCode = this.textContainsToken(normCode, t);
-      const inDesc = this.textContainsToken(normDesc, t);
-
-      if (inDesc) score += 6;
-      if (inCode) score += 3;
-
-      if (normDesc.startsWith(t)) score += 4;
-    }
-
-    return score;
-  }
 
   private showDefaultProducts(): void {
     this.products = this.allProducts.slice(0, this.MAX_RESULTS);

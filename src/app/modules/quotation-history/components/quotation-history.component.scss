@@ -1,161 +1,145 @@
-// ── Design tokens (mismos que Altec-Puntos) ───────────────────────────────
-$primary:       #6c5ce7;
-$primary-light: #a29bfe;
-$gold:          #fdcb6e;
-$green:         #00b894;
-$text-primary:  #e8eaf0;
-$text-muted:    #8892a4;
-$border:        rgba(255, 255, 255, 0.1);
-$card-bg:       rgba(255, 255, 255, 0.05);
+// ── Historial de Importaciones · mismos colores y formas que Bodega ──────
+$purple:       #8B50FB;
+$blue:         #60A5FA;
+$green:        #4ade80;
+$gold:         #fbbf24;
+$text-primary: #E6EDF3;
+$text-muted:   #8B949E;
+$border:       rgba(139, 80, 251, 0.2);
+$panel-bg:     rgba(255, 255, 255, 0.03);
 
-// ── Page ──────────────────────────────────────────────────────────────────
+// ── Página ────────────────────────────────────────────────────────────────
 .quotation-history-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0d1b2e 100%);
-  padding: 1rem 0 2rem;
+  background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
+  color: $text-primary;
 }
 
-// ── Header ────────────────────────────────────────────────────────────────
+// ── Título (igual que "Consultar Inventario") ────────────────────────────
 .page-header {
   text-align: center;
 
-  .header-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, rgba(0, 184, 148, 0.25), rgba(108, 92, 231, 0.15));
-    border: 1px solid rgba(0, 184, 148, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: $green;
-    margin: 0 auto 0.75rem;
-  }
-
   .page-title {
-    font-size: 1.9rem;
+    color: #ffffff;
+    font-family: 'Acephimere', sans-serif;
     font-weight: 800;
-    color: $text-primary;
-    text-shadow: 0 0 24px rgba(0, 184, 148, 0.25);
-    margin-bottom: 0.3rem;
-  }
-
-  .page-subtitle {
-    color: $text-muted;
-    font-size: 0.85rem;
+    font-size: 2.5rem;
     margin: 0;
+    text-shadow: 0 0 20px rgba(139, 80, 251, 0.3);
   }
 }
 
-// ── Cards ─────────────────────────────────────────────────────────────────
+// ── Paneles ───────────────────────────────────────────────────────────────
 .form-card {
-  background: $card-bg;
+  background: $panel-bg;
   border: 1px solid $border;
-  border-radius: 14px;
-  padding: 1.25rem 1.5rem;
+  border-radius: 15px;
+  padding: 1.5rem;
   height: 100%;
-  transition: border-color 0.25s;
-
-  &:hover { border-color: rgba(108, 92, 231, 0.28); }
 }
 
 .card-title {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: $text-primary;
-  margin-bottom: 1.25rem;
+  color: #ffffff;
+  margin: 0 0 1.25rem;
+  display: flex;
+  align-items: center;
 
-  i { color: $green; }
+  i { color: $purple; }
 }
 
-// ── Campos ────────────────────────────────────────────────────────────────
+// ── Formulario ────────────────────────────────────────────────────────────
 .field-label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: $text-muted;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.5rem;
+  color: $blue;
+  margin-bottom: 0.4rem;
 }
 
-.req-star { color: #ff7675; margin-left: 2px; }
+.req-star { color: #F87171; margin-left: 2px; }
 
 .field-error {
   display: block;
-  font-size: 0.78rem;
-  color: #ff7675;
+  font-size: 0.8rem;
+  color: #F87171;
   margin-top: 0.35rem;
 }
 
 .field-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid $border;
-  border-radius: 10px;
-  padding: 0.65rem 0.9rem;
-  color: $text-primary;
-  font-size: 0.9rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(139, 80, 251, 0.3);
+  border-radius: 50px;
+  color: #ffffff;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.95rem;
+  outline: none;
   color-scheme: dark;
+  transition: all 0.3s ease;
 
-  &::placeholder { color: rgba(136, 146, 164, 0.6); }
+  &::placeholder { color: rgba(255, 255, 255, 0.4); }
 
   &:focus {
-    outline: none;
-    border-color: $primary-light;
-    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $purple;
+    box-shadow: 0 0 20px rgba(139, 80, 251, 0.4);
   }
-
-  &.with-icon { padding-left: 2.4rem; }
 }
 
+// Buscador con lupa
 .input-icon-wrap {
   position: relative;
 
   .input-icon {
     position: absolute;
-    left: 0.85rem;
+    left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: $text-muted;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.1rem;
     pointer-events: none;
   }
+
+  .with-icon { padding-left: 2.8rem; }
 }
 
-// ── Drop zone ─────────────────────────────────────────────────────────────
+// ── Zona para soltar el Excel ────────────────────────────────────────────
 .drop-zone {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
-  min-height: 140px;
+  gap: 0.4rem;
+  min-height: 150px;
   padding: 1.25rem;
-  border: 2px dashed rgba(0, 184, 148, 0.3);
-  border-radius: 12px;
-  background: rgba(0, 184, 148, 0.04);
-  cursor: pointer;
   text-align: center;
-  transition: all 0.25s ease;
+  border: 2px dashed rgba(139, 80, 251, 0.35);
+  border-radius: 15px;
+  background: rgba(139, 80, 251, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
 
-  &:hover { border-color: rgba(0, 184, 148, 0.6); }
+  &:hover { border-color: $purple; background: rgba(139, 80, 251, 0.1); }
 
   &.drop-zone-active {
-    border-color: $green;
-    background: rgba(0, 184, 148, 0.1);
-    box-shadow: 0 0 0 4px rgba(0, 184, 148, 0.15);
+    border-color: $purple;
+    background: rgba(139, 80, 251, 0.15);
+    box-shadow: 0 0 20px rgba(139, 80, 251, 0.3);
 
-    // Mientras se arrastra, los hijos no deben capturar eventos (evita el parpadeo)
     * { pointer-events: none; }
   }
 
-  &.has-file { border-style: solid; }
+  &.has-file {
+    border-style: solid;
+    border-color: rgba(74, 222, 128, 0.5);
+    background: rgba(74, 222, 128, 0.06);
+  }
 
-  .drop-icon { font-size: 2.2rem; color: $green; }
-  .drop-text { color: $text-primary; font-weight: 600; font-size: 0.9rem; }
-  .drop-hint { color: $text-muted; font-size: 0.75rem; }
+  .drop-icon { font-size: 2.4rem; color: $green; }
+  .drop-text { font-weight: 600; color: #ffffff; }
+  .drop-hint { font-size: 0.78rem; color: $text-muted; }
 }
 
 .file-chip {
@@ -163,212 +147,255 @@ $card-bg:       rgba(255, 255, 255, 0.05);
   align-items: center;
   gap: 0.75rem;
   width: 100%;
+  text-align: left;
 
-  > i { font-size: 2rem; color: $green; }
+  > .bi { font-size: 2rem; color: $green; flex-shrink: 0; }
 
   .file-info {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    text-align: left;
-    min-width: 0;
-    flex: 1;
   }
 
   .file-name {
-    color: $text-primary;
     font-weight: 600;
-    font-size: 0.88rem;
+    color: #ffffff;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .file-size { color: $text-muted; font-size: 0.75rem; }
+  .file-size { font-size: 0.8rem; color: $text-muted; }
+}
 
-  .file-remove {
-    border: none;
-    background: rgba(255, 118, 117, 0.15);
-    color: #ff7675;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    flex-shrink: 0;
+.file-remove {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.1);
+  color: #F87171;
+  transition: all 0.2s ease;
 
-    &:hover { background: rgba(255, 118, 117, 0.3); }
-  }
+  &:hover { background: #ef4444; border-color: #ef4444; color: #fff; }
 }
 
 // ── Botones ───────────────────────────────────────────────────────────────
 .btn-primary-action {
   width: 100%;
-  border: none;
-  border-radius: 12px;
-  padding: 0.8rem 1rem;
-  font-weight: 700;
-  color: #fff;
-  background: linear-gradient(135deg, $green, #00a383);
-  box-shadow: 0 4px 16px rgba(0, 184, 148, 0.3);
-  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.5rem;
+  border: 2px solid #10B981;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.3s ease;
 
   &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #059669, #047857);
     transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(0, 184, 148, 0.4);
+    box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
   }
 
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 
 .btn-ghost {
-  border: 1px solid $border;
-  background: transparent;
-  color: $text-muted;
-  border-radius: 10px;
-  padding: 0.6rem 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 1.25rem;
+  border: 2px solid $purple;
+  border-radius: 25px;
+  background: rgba(139, 80, 251, 0.2);
+  color: #ffffff;
+  font-weight: 600;
   white-space: nowrap;
-  align-self: flex-end;
+  transition: all 0.3s ease;
 
-  &:hover { color: $text-primary; border-color: $primary-light; }
+  &:hover { background: $purple; transform: translateY(-2px); box-shadow: 0 5px 20px rgba(139, 80, 251, 0.4); }
+}
+
+.btn-view,
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.8rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  transition: all 0.3s ease;
+
+  &:disabled { opacity: 0.6; cursor: wait; }
+}
+
+// Botones solo con ícono en la tabla (el texto va en el tooltip)
+.btn-icon {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.btn-view {
+  border: 2px solid rgba(96, 165, 250, 0.5);
+  background: rgba(96, 165, 250, 0.12);
+  color: $blue;
+
+  &:hover:not(:disabled) { background: $blue; border-color: $blue; color: #fff; transform: translateY(-2px); }
 }
 
 .btn-download {
-  border: 1px solid rgba(108, 92, 231, 0.4);
-  background: rgba(108, 92, 231, 0.15);
-  color: $primary-light;
-  border-radius: 8px;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.82rem;
-  font-weight: 600;
-  white-space: nowrap;
-  transition: all 0.2s;
+  border: 2px solid $purple;
+  background: rgba(139, 80, 251, 0.2);
+  color: #ffffff;
 
-  &:hover:not(:disabled) { background: rgba(108, 92, 231, 0.3); color: #fff; }
-  &:disabled { opacity: 0.6; }
+  &:hover:not(:disabled) {
+    background: $purple;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(139, 80, 251, 0.4);
+  }
 }
 
-// ── KPIs y filtros ────────────────────────────────────────────────────────
+// ── Indicadores ───────────────────────────────────────────────────────────
 .kpi-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .kpi {
   display: flex;
   flex-direction: column;
-  padding: 0.8rem 1rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid $border;
+  gap: 0.25rem;
+  padding: 0.9rem 1.25rem;
+  background: rgba(22, 27, 34, 0.6);
+  border: 2px solid rgba(96, 165, 250, 0.2);
+  border-radius: 15px;
 
   .kpi-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $text-muted;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: $text-muted;
   }
 
   .kpi-value {
-    font-size: 1.35rem;
+    font-size: 1.6rem;
     font-weight: 800;
-    color: $text-primary;
+    color: #ffffff;
+    line-height: 1.1;
+
+    &.gold { color: $green; }
+    &.extra { color: $gold; }
   }
+
+  .kpi-hint { font-size: 0.75rem; color: $text-muted; }
 }
 
+// ── Filtros ───────────────────────────────────────────────────────────────
 .filters {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1rem;
-
-  .input-icon-wrap { min-width: 220px; align-self: flex-end; }
-
-  .date-filter {
-    display: flex;
-    flex-direction: column;
-    min-width: 150px;
-
-    label {
-      font-size: 0.7rem;
-      color: $text-muted;
-      text-transform: uppercase;
-      margin-bottom: 0.25rem;
-    }
-  }
+  margin-bottom: 1.25rem;
 }
 
+// ── Estados (cargando / vacío) ───────────────────────────────────────────
 .state-box {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 3rem 1rem;
+  padding: 2.5rem 1rem;
   color: $text-muted;
+  background: rgba(22, 27, 34, 0.6);
+  border: 2px solid rgba(96, 165, 250, 0.2);
+  border-radius: 15px;
 
-  i { font-size: 2rem; }
+  .bi { font-size: 2rem; color: rgba(139, 80, 251, 0.6); }
 }
 
-// ── Tabla ─────────────────────────────────────────────────────────────────
+// ── Tabla (igual que la de Bodega) ───────────────────────────────────────
+.table-responsive,
+.detail-table-wrap {
+  background: rgba(22, 27, 34, 0.6);
+  border: 2px solid rgba(96, 165, 250, 0.2);
+  border-radius: 15px;
+  padding: 0.75rem;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+}
+
 .history-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  color: $text-primary;
-  font-size: 0.88rem;
+  border-collapse: collapse;
+  margin: 0;
 
-  th {
-    font-size: 0.72rem;
+  thead th {
+    background: #161B22;
+    color: $text-primary;
+    font-weight: 700;
     text-transform: uppercase;
+    font-size: 0.8rem;
     letter-spacing: 0.5px;
-    color: $text-muted;
-    font-weight: 600;
-    padding: 0.6rem 0.75rem;
-    border-bottom: 1px solid $border;
+    padding: 0.85rem 0.6rem;
+    border-bottom: 2px solid $blue;
+    white-space: nowrap;
   }
 
-  td {
-    padding: 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  tbody tr {
+    background: #161B22;
+    border-bottom: 1px solid rgba(96, 165, 250, 0.15);
+    transition: all 0.3s ease;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  tbody td {
+    padding: 0.85rem 0.6rem;
     vertical-align: middle;
+    color: $text-primary;
   }
 
-  tbody tr { transition: background 0.2s; }
-  tbody tr:hover { background: rgba(108, 92, 231, 0.08); }
-
-  .q-name { display: block; font-weight: 600; }
-  .q-file { display: block; font-size: 0.75rem; color: $text-muted; }
+  .gold { color: $green; font-weight: 700; }
+  .muted { color: $text-muted; }
 }
 
-.gold { color: $gold; font-weight: 700; }
-.muted { color: $text-muted; }
+.clickable-row {
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(96, 165, 250, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
+  }
+}
+
 .nowrap { white-space: nowrap; }
 
-@media (max-width: 576px) {
-  .page-header .page-title { font-size: 1.4rem; }
-  .kpi-row { grid-template-columns: 1fr; }
-  .form-card { padding: 1rem; }
-}
-
-// ── Filas clicables y botón Ver ───────────────────────────────────────────
-.clickable-row { cursor: pointer; }
-
-.btn-view {
-  border: 1px solid rgba(0, 184, 148, 0.4);
-  background: rgba(0, 184, 148, 0.12);
-  color: $green;
-  border-radius: 8px;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.82rem;
+.q-name {
+  display: block;
+  min-width: 150px;
   font-weight: 600;
-  white-space: nowrap;
-  transition: all 0.2s;
-
-  &:hover:not(:disabled) { background: rgba(0, 184, 148, 0.25); color: #fff; }
-  &:disabled { opacity: 0.6; }
+  color: #ffffff;
 }
 
-// ── Modal de detalle ──────────────────────────────────────────────────────
+.q-file {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  color: $text-muted;
+}
+
+// ── Ventana de detalle ───────────────────────────────────────────────────
 .detail-backdrop {
   position: fixed;
   inset: 0;
@@ -377,7 +404,7 @@ $card-bg:       rgba(255, 255, 255, 0.05);
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(5, 5, 15, 0.75);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
 }
 
@@ -387,9 +414,9 @@ $card-bg:       rgba(255, 255, 255, 0.05);
   max-height: calc(100dvh - 2rem);
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #12122a 0%, #1a1a2e 60%, #0f1d30 100%);
-  border: 1px solid rgba(108, 92, 231, 0.3);
-  border-radius: 16px;
+  background: linear-gradient(135deg, #1a2332 0%, #0a1929 100%);
+  border: 2px solid rgba(139, 80, 251, 0.3);
+  border-radius: 15px;
   padding: 1.25rem 1.5rem;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
@@ -399,14 +426,16 @@ $card-bg:       rgba(255, 255, 255, 0.05);
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+  padding-bottom: 1rem;
   margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(139, 80, 251, 0.3);
 
   .detail-title-wrap { min-width: 0; }
 
   .detail-title {
     font-size: 1.3rem;
     font-weight: 800;
-    color: $text-primary;
+    color: #ffffff;
     margin: 0 0 0.25rem;
     overflow-wrap: anywhere;
   }
@@ -414,37 +443,410 @@ $card-bg:       rgba(255, 255, 255, 0.05);
   .detail-meta {
     font-size: 0.8rem;
     color: $text-muted;
+
+    .bi { color: $purple; }
   }
 }
 
 .btn-close-modal {
-  border: 1px solid $border;
-  background: rgba(255, 255, 255, 0.05);
-  color: $text-muted;
   width: 38px;
   height: 38px;
-  border-radius: 10px;
   flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: $text-muted;
+  transition: all 0.2s ease;
 
-  &:hover { color: #fff; border-color: #ff7675; background: rgba(255, 118, 117, 0.15); }
+  &:hover { color: #fff; border-color: #ef4444; background: rgba(239, 68, 68, 0.2); }
 }
 
 .detail-table-wrap {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  border: 1px solid $border;
-  border-radius: 12px;
 
-  thead th {
+  .history-table thead th {
     position: sticky;
     top: 0;
-    background: #17172f;
     z-index: 1;
   }
 }
 
+// ── Costos extras de importación ─────────────────────────────────────────
+.extra-amount {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: $gold;
+  font-weight: 700;
+
+  .extra-pct { font-size: 0.72rem; font-weight: 600; color: $text-muted; }
+}
+
+.history-table .ecuador,
+.costs-preview .ecuador { color: $gold; font-weight: 700; }
+
+// Columna "Costo en Ecuador" resaltada en amarillo suave
+.history-table th.col-ecuador,
+.history-table td.col-ecuador {
+  background: rgba(251, 191, 36, 0.12);
+}
+
+.history-table th.col-ecuador {
+  color: $gold;
+  border-bottom-color: $gold;
+}
+
+.btn-extra {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid rgba(251, 191, 36, 0.5);
+  background: rgba(251, 191, 36, 0.12);
+  color: $gold;
+  transition: all 0.3s ease;
+
+  &:hover { background: $gold; border-color: $gold; color: #1a2332; transform: translateY(-2px); }
+}
+
+.btn-extra-text {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 1rem;
+  border-radius: 25px;
+  border: 2px solid rgba(251, 191, 36, 0.5);
+  background: rgba(251, 191, 36, 0.12);
+  color: $gold;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+
+  &:hover { background: $gold; border-color: $gold; color: #1a2332; }
+}
+
+.costs-backdrop { z-index: 1060; }
+
+.costs-modal {
+  width: min(520px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  background: linear-gradient(135deg, #1a2332 0%, #0a1929 100%);
+  border: 2px solid rgba(139, 80, 251, 0.3);
+  border-radius: 15px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.costs-help {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: $text-muted;
+  background: rgba(139, 80, 251, 0.08);
+  border: 1px solid $border;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+
+  strong { color: $text-primary; }
+}
+
+.input-icon-wrap .input-icon.money { color: $green; font-weight: 700; }
+
+.costs-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: rgba(22, 27, 34, 0.6);
+  border: 2px solid rgba(96, 165, 250, 0.2);
+  font-size: 0.88rem;
+  color: $text-muted;
+
+  strong { color: #ffffff; }
+  .costs-pct { flex-basis: 100%; color: $blue; font-weight: 600; }
+}
+
+.costs-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+
+  .btn-ghost { align-self: auto; }
+  .btn-primary-action.w-auto { width: auto; }
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .page-header .page-title { font-size: 1.8rem; }
+}
+
 @media (max-width: 576px) {
+  .page-header .page-title { font-size: 1.5rem; }
+  .kpi-row { grid-template-columns: 1fr; }
+  .form-card { padding: 1rem; }
   .detail-modal { padding: 1rem; }
   .detail-header .detail-title { font-size: 1.1rem; }
+}
+
+// ── Proyección de ganancias ──────────────────────────────────────────────
+.detail-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.btn-projection {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 1.5rem;
+  border: 2px solid #10B981;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+  }
+}
+
+.projection-backdrop { z-index: 1055; }
+
+.projection-modal {
+  width: min(1300px, 100%);
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: linear-gradient(135deg, #1a2332 0%, #0a1929 100%);
+  border: 2px solid rgba(16, 185, 129, 0.35);
+  border-radius: 15px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+  .detail-table-wrap { flex: none; max-height: 55vh; }
+}
+
+.kpi.kpi-profit {
+  border-color: rgba(74, 222, 128, 0.45);
+  background: rgba(74, 222, 128, 0.06);
+}
+
+.proj-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  background: $panel-bg;
+  border: 1px solid $border;
+  border-radius: 15px;
+}
+
+.proj-control {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+
+  select.field-input option { background: #1a2332; color: #fff; }
+}
+
+.proj-margin-input {
+  position: relative;
+  max-width: 160px;
+
+  .field-input { padding-right: 2.2rem; font-weight: 700; font-size: 1.1rem; }
+  .suffix { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: $text-muted; font-weight: 700; }
+}
+
+.proj-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+
+  .preset {
+    padding: 0.2rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid $border;
+    background: rgba(139, 80, 251, 0.1);
+    color: $text-primary;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+
+    &:hover { border-color: $purple; }
+    &.active { background: $purple; border-color: $purple; color: #fff; }
+  }
+}
+
+.proj-actions {
+  margin-left: auto;
+  align-items: flex-end;
+  gap: 0.5rem;
+
+  .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+}
+
+.proj-custom { font-size: 0.8rem; color: $blue; }
+
+.proj-top {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+  padding: 0.9rem 1.25rem;
+  background: rgba(22, 27, 34, 0.6);
+  border: 2px solid rgba(96, 165, 250, 0.2);
+  border-radius: 15px;
+
+  .proj-top-title { font-size: 0.78rem; font-weight: 700; color: $text-muted; text-transform: uppercase; letter-spacing: 0.5px; }
+}
+
+.proj-top-item {
+  display: grid;
+  grid-template-columns: minmax(140px, 2fr) 3fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+
+  .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+  .fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #10B981, $green); }
+  .value { color: $green; font-weight: 700; white-space: nowrap; }
+}
+
+.proj-sort { max-width: 200px; }
+
+.proj-table {
+  tr.custom td:first-child { box-shadow: inset 3px 0 0 $blue; }
+
+  .negative { color: #F87171 !important; }
+
+  tfoot td {
+    padding: 0.85rem 0.6rem;
+    background: #0f1722;
+    border-top: 2px solid $blue;
+    font-weight: 700;
+    color: #fff;
+    position: sticky;
+    bottom: 0;
+  }
+}
+
+.cell-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(139, 80, 251, 0.35);
+  border-radius: 20px;
+  padding: 0 0.4rem 0 0.6rem;
+  transition: border-color 0.2s ease;
+
+  &:focus-within { border-color: $purple; box-shadow: 0 0 12px rgba(139, 80, 251, 0.35); }
+
+  input {
+    width: 70px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-weight: 600;
+    text-align: right;
+    padding: 0.3rem 0;
+    -moz-appearance: textfield;
+    appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    &::placeholder { color: rgba(255, 255, 255, 0.35); }
+  }
+
+  &.pvp span { color: $text-muted; font-weight: 600; }
+  &.pvp input { width: 80px; }
+}
+
+.cell-reset {
+  border: none;
+  background: none;
+  color: $text-muted;
+  padding: 0;
+  line-height: 1;
+
+  &:hover { color: #F87171; }
+}
+
+.proj-note {
+  margin: 1rem 0 0;
+  font-size: 0.8rem;
+  color: $text-muted;
+}
+
+@media (max-width: 768px) {
+  .proj-actions { margin-left: 0; align-items: flex-start; }
+  .proj-top-item { grid-template-columns: 1fr auto; .bar { display: none; } }
+}
+
+// ── Fotos del Excel ──────────────────────────────────────────────────────
+.history-table .col-photo { width: 64px; padding-left: 0.4rem; padding-right: 0.4rem; }
+
+.photo-thumb {
+  width: 52px;
+  height: 52px;
+  padding: 2px;
+  border-radius: 10px;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  background: #ffffff;
+  cursor: zoom-in;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+
+  &:hover { transform: scale(1.08); box-shadow: 0 4px 14px rgba(96, 165, 250, 0.4); }
+}
+
+.photo-empty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.zoom-backdrop { z-index: 1070; cursor: zoom-out; }
+
+.zoom-img {
+  max-width: min(720px, 92vw);
+  max-height: 85vh;
+  object-fit: contain;
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 0.75rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  cursor: default;
+}
+
+.zoom-close { position: absolute; top: 1rem; right: 1rem; }
+
+.proj-file-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-left: auto;
+  align-self: center;
 }
