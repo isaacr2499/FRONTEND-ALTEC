@@ -2277,3 +2277,373 @@ $success-color: #00b894;
     color: #e2e8f0;
   }
 }
+
+// ════════════════════════════════════════════════════════════════════════
+// Rediseño: mismo estilo que Bodega e Historial de Importaciones.
+// Flujo de venta: buscar → agregar → (cliente y comprobante en el carrito) → cobrar.
+// ════════════════════════════════════════════════════════════════════════
+$v-purple: #8B50FB;
+$v-blue: #60A5FA;
+$v-green: #4ade80;
+$v-text: #E6EDF3;
+$v-muted: #8B949E;
+$v-border: rgba(139, 80, 251, 0.2);
+
+.pos-container {
+  background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%) !important;
+  min-height: 100vh;
+  color: $v-text;
+}
+
+// Título simple, como "Consultar Inventario"
+.pos-header {
+  background: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  padding: 1.25rem 0 0.5rem !important;
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pos-title {
+    margin: 0;
+    color: #fff !important;
+    font-family: 'Acephimere', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem !important;
+    letter-spacing: 0;
+    text-transform: none;
+    text-shadow: 0 0 20px rgba(139, 80, 251, 0.3);
+    background: none !important;
+    -webkit-text-fill-color: #fff !important;
+
+    .bi { margin-right: 0.5rem; }
+  }
+
+  .btn-premium {
+    border: 2px solid $v-purple;
+    background: rgba(139, 80, 251, 0.2);
+    color: #fff;
+    border-radius: 25px;
+    font-weight: 600;
+
+    .cart-counter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      margin-left: 0.35rem;
+      border-radius: 10px;
+      background: $v-green;
+      color: #0a1929;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+  }
+}
+
+.pos-main { padding-top: 0.5rem !important; }
+
+// Tarjetas
+.section-card {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid $v-border !important;
+  border-radius: 15px !important;
+  box-shadow: none !important;
+  padding: 1.1rem 1.25rem !important;
+
+  .section-header {
+    border-bottom: 1px solid rgba(139, 80, 251, 0.15) !important;
+    padding-bottom: 0.6rem !important;
+    margin-bottom: 0.9rem !important;
+
+    h5 {
+      color: #fff !important;
+      font-size: 1.05rem !important;
+      font-weight: 700;
+
+      .bi { color: $v-purple; }
+    }
+  }
+}
+
+// ── Buscador grande + cargar cotización en la misma fila ────────────────
+.search-section { padding: 1rem 1.25rem !important; }
+
+.search-bar-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.search-wrapper {
+  position: relative;
+  min-width: 260px;
+
+  .search-icon {
+    position: absolute;
+    left: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 1.2rem;
+    pointer-events: none;
+  }
+}
+
+.search-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(139, 80, 251, 0.35);
+  border-radius: 50px;
+  color: #fff;
+  font-size: 1.05rem;
+  padding: 0.8rem 1.25rem 0.8rem 3rem;
+  outline: none;
+  transition: all 0.3s ease;
+
+  &::placeholder { color: rgba(255, 255, 255, 0.4); }
+
+  &:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $v-purple;
+    box-shadow: 0 0 20px rgba(139, 80, 251, 0.4);
+  }
+}
+
+.quotation-inline {
+  flex: 0 1 380px;
+  min-width: 260px;
+
+  .input-group {
+    flex-wrap: nowrap;
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    border-radius: 50px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+
+    .input-group-text {
+      border: none;
+      color: $v-blue;
+      padding-left: 1rem;
+    }
+
+    .form-control {
+      border: none;
+      background: transparent !important;
+      color: #fff !important;
+      padding: 0.7rem 0.4rem;
+      box-shadow: none !important;
+
+      &::placeholder { color: rgba(255, 255, 255, 0.4); }
+    }
+
+    .btn {
+      border: none;
+      border-radius: 0 50px 50px 0;
+      background: rgba(96, 165, 250, 0.15);
+      color: $v-blue;
+      font-weight: 600;
+      padding: 0 1.1rem;
+
+      &:hover:not(:disabled) { background: $v-blue; color: #fff; }
+    }
+  }
+
+  .quotation-result {
+    background: rgba(22, 27, 34, 0.7);
+    border: 1px solid rgba(74, 222, 128, 0.35);
+    border-radius: 12px;
+    padding: 0.75rem;
+  }
+}
+
+// ── Productos ─────────────────────────────────────────────────────────
+.products-section .badge {
+  background: rgba(139, 80, 251, 0.2) !important;
+  border: 1px solid $v-purple;
+  color: #fff;
+  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  font-weight: 600;
+}
+
+.product-card {
+  background: #161B22 !important;
+  border: 1px solid rgba(96, 165, 250, 0.2) !important;
+  border-radius: 14px !important;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: $v-blue !important;
+    box-shadow: 0 6px 18px rgba(96, 165, 250, 0.25) !important;
+  }
+}
+
+// ── Carrito: panel fijo a la derecha con todo el cobro ─────────────────
+@media (min-width: 992px) {
+  .cart-sidebar {
+    position: sticky !important;
+    top: 90px;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+  }
+}
+
+.cart-sidebar {
+  background: rgba(22, 27, 34, 0.85) !important;
+  border: 2px solid $v-border !important;
+  border-radius: 15px !important;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.45) !important;
+
+  .cart-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(139, 80, 251, 0.2) !important;
+
+    h5 {
+      color: #fff !important;
+      font-weight: 700;
+
+      .bi { color: $v-green; }
+    }
+  }
+}
+
+// Cliente dentro del carrito: sin tarjeta propia, compacto
+.cart-client {
+  padding: 0 1rem;
+  margin-top: 0.75rem;
+
+  .section-card {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(96, 165, 250, 0.18) !important;
+    border-radius: 12px !important;
+    padding: 0.75rem 0.9rem !important;
+  }
+
+  .section-header {
+    margin-bottom: 0.6rem !important;
+
+    h5 { font-size: 0.95rem !important; }
+  }
+
+  .form-label {
+    font-size: 0.72rem !important;
+    color: $v-blue !important;
+    margin-bottom: 0.2rem;
+  }
+
+  .form-control {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1.5px solid rgba(139, 80, 251, 0.3) !important;
+    border-radius: 20px !important;
+    color: #fff !important;
+    font-size: 0.85rem !important;
+    padding: 0.4rem 0.8rem !important;
+
+    &:focus {
+      border-color: $v-purple !important;
+      box-shadow: 0 0 12px rgba(139, 80, 251, 0.35) !important;
+    }
+
+    &::placeholder { color: rgba(255, 255, 255, 0.35); }
+  }
+}
+
+.cart-summary {
+  .total-row .total-amount { color: $v-green !important; }
+}
+
+// Botones de acción con las formas del sistema (píldora)
+.cart-actions {
+  .btn-success {
+    background: linear-gradient(135deg, #10B981, #059669) !important;
+    border: none !important;
+    border-radius: 25px !important;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #059669, #047857) !important;
+      transform: translateY(-2px);
+    }
+
+    &:disabled { background: rgba(139, 148, 158, 0.35) !important; box-shadow: none; }
+  }
+
+  .btn-danger {
+    background: rgba(248, 113, 113, 0.1) !important;
+    border: 1.5px solid rgba(248, 113, 113, 0.45) !important;
+    color: #F87171 !important;
+    border-radius: 25px !important;
+
+    &:hover { background: #ef4444 !important; color: #fff !important; }
+  }
+}
+
+@media (max-width: 768px) {
+  .pos-header .pos-title { font-size: 1.6rem !important; }
+  .quotation-inline { flex-basis: 100%; }
+}
+
+// Sugerencias de cotizaciones mientras se escribe el número
+.quotation-inline { position: relative; }
+
+.quote-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #161B22;
+  border: 2px solid rgba(96, 165, 250, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+
+  button {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #E6EDF3;
+    text-align: left;
+    transition: background 0.15s ease;
+
+    &:hover { background: rgba(96, 165, 250, 0.15); }
+  }
+
+  .q-num { font-weight: 700; color: #60A5FA; font-family: 'Courier New', monospace; }
+  .q-meta { font-size: 0.8rem; color: #8B949E; }
+  .q-total { font-weight: 700; color: #4ade80; }
+}
+
+// La tarjeta del buscador queda por encima de los productos para que la lista
+// de cotizaciones no se esconda detrás de ellos
+.search-section {
+  position: relative;
+  z-index: 60 !important;
+  overflow: visible !important;
+}
+
+.products-section {
+  position: relative;
+  z-index: 1;
+}
+
+.quote-suggestions { z-index: 100; }

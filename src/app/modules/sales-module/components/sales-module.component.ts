@@ -101,11 +101,6 @@ export class SalesModuleComponent implements OnInit {
   subtotal: number = 0;
   total: number = 0;
 
-  // 💵 Calculadora de Cambio (para Efectivo)
-  montoRecibido: number = 0;
-  cambio: number = 0;
-  showCalculadoraCambio: boolean = false;
-
   // 🧾 Comprobante: recibo (sin datos del cliente) o factura electrónica SRI
   tipoComprobante: 'recibo' | 'factura' = 'recibo';
 
@@ -177,15 +172,7 @@ export class SalesModuleComponent implements OnInit {
       }
     }
 
-    // 💵 Si es EFECTIVO, mostrar calculadora de cambio
-    if (this.selectedPaymentMethod === 'efectivo') {
-      this.showCalculadoraCambio = true;
-      this.montoRecibido = 0;
-      this.cambio = 0;
-      return;
-    }
-
-    // 💳 Si es otro método de pago, continuar normal
+    // Confirmar y vender (cualquier método de pago)
     const clientName = this.formGroup.get('clientName')?.value || 'Cliente General';
 
     Notiflix.Confirm.show(
@@ -242,8 +229,8 @@ export class SalesModuleComponent implements OnInit {
           })),
           total: this.total,
           paymentMethod,
-          recibido: paymentMethod === 'efectivo' ? this.montoRecibido : 0,
-          cambio: paymentMethod === 'efectivo' ? Math.max(this.montoRecibido - this.total, 0) : 0
+          recibido: 0,
+          cambio: 0
         }
       : null;
 
@@ -528,93 +515,10 @@ export class SalesModuleComponent implements OnInit {
 
   selectPaymentMethod(methodId: string): void {
     this.selectedPaymentMethod = methodId;
-
-    // 💳 Si cambia a otro método que NO sea efectivo, cerrar calculadora
-    if (methodId !== 'efectivo' && this.showCalculadoraCambio) {
-      this.cerrarCalculadora();
-    }
   }
 
   selectTipoComprobante(tipo: 'recibo' | 'factura'): void {
     this.tipoComprobante = tipo;
-  }
-
-  // 💵 CALCULADORA DE CAMBIO
-  calcularCambio(): void {
-    this.cambio = this.montoRecibido - this.total;
-  }
-
-  limpiarMonto(): void {
-    this.montoRecibido = 0;
-    this.cambio = -this.total;
-  }
-
-  cerrarCalculadora(): void {
-    this.showCalculadoraCambio = false;
-    this.montoRecibido = 0;
-    this.cambio = 0;
-  }
-
-  procesarCobroEfectivo(): void {
-    // Validar que el monto recibido sea suficiente
-    if (this.montoRecibido < this.total) {
-      Notiflix.Notify.warning('El monto recibido es menor al total. Verifica el pago.');
-      return;
-    }
-
-    // Calcular cambio final
-    this.calcularCambio();
-
-    // Cerrar calculadora
-    this.showCalculadoraCambio = false;
-
-    // Mostrar confirmación con el cambio
-    const clientName = this.formGroup.get('clientName')?.value || 'Cliente General';
-
-    Notiflix.Confirm.show(
-      '💵 Confirmar Cobro en Efectivo',
-      `
-        <div style="text-align: left; padding: 10px;">
-          <p><strong>Cliente:</strong> ${clientName}</p>
-          <p><strong>Total a pagar:</strong> $${this.total.toFixed(2)}</p>
-          <p><strong>Recibido:</strong> $${this.montoRecibido.toFixed(2)}</p>
-          <p style="color: #00b894; font-size: 1.2rem; font-weight: bold;">
-            <strong>Cambio:</strong> $${this.cambio.toFixed(2)}
-          </p>
-        </div>
-      `,
-      '✅ Guardar en Caja',
-      'Cancelar',
-      () => {
-        this.realizarVenta();
-      },
-      () => {
-        // ❌ CANCELADO - Volver a mostrar calculadora
-        this.showCalculadoraCambio = true;
-      },
-      {
-        titleColor: '#ffffff',
-        messageColor: '#ffffff',
-        backgroundColor: '#1e1e2f',
-        okButtonBackground: '#28a745',
-        cancelButtonBackground: '#dc3545',
-        okButtonColor: '#ffffff',
-        cancelButtonColor: '#ffffff',
-        borderRadius: '12px',
-        width: '420px'
-      }
-    );
-  }
-
-  // Método para botones rápidos de monto
-  agregarMonto(monto: number): void {
-    this.montoRecibido += monto;
-    this.calcularCambio();
-  }
-
-  setMontoExacto(): void {
-    this.montoRecibido = this.total;
-    this.calcularCambio();
   }
 
   // 🔍 Limpiar búsqueda al hacer focus
@@ -633,7 +537,73 @@ export class SalesModuleComponent implements OnInit {
   buscandoCotizacion: boolean = false;
   cotizacionCargada: any[] | null = null;
 
+  // Sugerencias mientras se escribe el número de cotización
+  private cotizacionesGuardadas: any[] | null = null;
+  private cargandoCotizaciones = false;
+  sugerenciasCotizacion: any[] = [];
+  mostrarSugerencias = false;
+
+  /** Trae una sola vez las cotizaciones guardadas (número, fecha, productos y total). */
+  private cargarCotizacionesGuardadas(): void {
+    if (this.cotizacionesGuardadas || this.cargandoCotizaciones) return;
+    this.cargandoCotizaciones = true;
+    this.http.get<any[]>(`${environment.apiALTEC}/api/cotizaciones`).subscribe({
+      next: (data) => {
+        this.cotizacionesGuardadas = data ?? [];
+        this.cargandoCotizaciones = false;
+        this.filtrarCotizaciones();
+      },
+      error: () => {
+        this.cargandoCotizaciones = false;
+      }
+    });
+  }
+
+  onNumeroCotizacionFocus(): void {
+    this.cargarCotizacionesGuardadas();
+    this.mostrarSugerencias = true;
+    this.filtrarCotizaciones();
+  }
+
+  onNumeroCotizacionChange(value: string): void {
+    this.numeroCotizacion = value;
+    this.cotizacionCargada = null;
+    this.mostrarSugerencias = true;
+    this.cargarCotizacionesGuardadas();
+    this.filtrarCotizaciones();
+  }
+
+  /** Las que empiezan con lo escrito primero, luego las que lo contienen; las más recientes arriba. */
+  private filtrarCotizaciones(): void {
+    const term = (this.numeroCotizacion || '').replace(/\D/g, '');
+    const lista = [...(this.cotizacionesGuardadas ?? [])]
+      .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    if (!term) {
+      this.sugerenciasCotizacion = lista.slice(0, 6);
+      return;
+    }
+    const empiezan = lista.filter(c => String(c.quotationNumber).startsWith(term));
+    const contienen = lista.filter(c => !String(c.quotationNumber).startsWith(term) && String(c.quotationNumber).includes(term));
+    this.sugerenciasCotizacion = [...empiezan, ...contienen].slice(0, 8);
+  }
+
+  elegirCotizacion(c: any): void {
+    this.numeroCotizacion = String(c.quotationNumber);
+    this.mostrarSugerencias = false;
+    if (c.items?.length) {
+      this.cotizacionCargada = c.items;
+    } else {
+      this.buscarCotizacion();
+    }
+  }
+
+  ocultarSugerencias(): void {
+    // Espera un instante para que el click en una sugerencia alcance a registrarse
+    setTimeout(() => this.mostrarSugerencias = false, 150);
+  }
+
   buscarCotizacion(): void {
+    this.mostrarSugerencias = false;
     const numero = this.numeroCotizacion.trim();
     if (!numero) {
       Notiflix.Notify.warning('Ingresa un número de cotización.');

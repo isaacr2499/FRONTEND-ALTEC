@@ -57,9 +57,7 @@ export class ElectronicInvoicesComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    const hoy = this.hoyEcuador();
-    this.hasta = hoy;
-    this.desde = `${hoy.substring(0, 8)}01`; // desde el 1 del mes
+    // Al entrar se muestran todas las facturas; las fechas son un filtro opcional
     this.sub = this.buscar$.pipe(debounceTime(400), distinctUntilChanged())
       .subscribe(() => this.aplicarFiltros());
     this.cargar();
@@ -112,9 +110,8 @@ export class ElectronicInvoicesComponent implements OnInit, OnDestroy {
   }
 
   limpiarFiltros(): void {
-    const hoy = this.hoyEcuador();
-    this.hasta = hoy;
-    this.desde = `${hoy.substring(0, 8)}01`;
+    this.desde = '';
+    this.hasta = '';
     this.estado = '';
     this.buscar = '';
     this.aplicarFiltros();
@@ -276,8 +273,4 @@ export class ElectronicInvoicesComponent implements OnInit, OnDestroy {
     URL.revokeObjectURL(url);
   }
 
-  private hoyEcuador(): string {
-    // en-CA da el formato aaaa-mm-dd
-    return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Guayaquil' }).format(new Date());
-  }
 }

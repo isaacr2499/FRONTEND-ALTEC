@@ -1,8 +1,7 @@
 <div class="einv-container">
   <header class="einv-header">
     <div class="container-fluid">
-      <h1 class="einv-title"><i class="bi bi-file-earmark-check"></i> FACTURAS ELECTRÓNICAS</h1>
-      <p class="einv-subtitle">Histórico de facturas emitidas al SRI</p>
+      <h1 class="einv-title"><i class="bi bi-file-earmark-check"></i> Facturas Electrónicas</h1>
     </div>
   </header>
 
@@ -43,7 +42,8 @@
         <input type="text" class="form-control form-control-sm" placeholder="Cliente, cédula/RUC o N° de factura"
                [(ngModel)]="buscar" (ngModelChange)="onBuscarChange($event)">
       </div>
-      <button type="button" class="btn btn-sm btn-outline-light" (click)="limpiarFiltros()">
+      <button type="button" class="btn-limpiar" (click)="limpiarFiltros()"
+              *ngIf="desde || hasta || estado || buscar">
         <i class="bi bi-x-circle"></i> Limpiar
       </button>
     </section>

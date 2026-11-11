@@ -2,38 +2,16 @@
   <header class="pos-header">
     <div class="container-fluid">
       <div class="header-content">
-        <div class="header-left">
-          <h1 class="pos-title">
-            <i class="bi bi-bag-check"></i> MÓDULO DE VENTAS
-            <span class="premium-crown">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2.5 16h19v2.5h-19V16zm0 3h19v1.5h-19V19z" fill="url(#goldGradient)"/>
-                <path d="M12 2l2.5 5 5.5.5-4 4 1 5.5-5-3-5 3 1-5.5-4-4 5.5-.5L12 2z" fill="url(#goldGradient)"/>
-                <circle cx="12" cy="9" r="1.2" fill="#FFD700"/>
-                <circle cx="7" cy="11" r="1" fill="#FFD700"/>
-                <circle cx="17" cy="11" r="1" fill="#FFD700"/>
-                <defs>
-                  <linearGradient id="goldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
-                    <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </span>
-          </h1>
-          <p class="header-subtitle">Sistema de Punto de Venta Premium</p>
-          <p class="powered-by">Powered by <span class="swift-brand">Swift</span></p>
-        </div>
+        <h1 class="pos-title">
+          <i class="bi bi-bag-check"></i> Ventas
+        </h1>
         <div class="header-right d-flex align-items-center gap-2">
-          <span class="cart-counter d-lg-none" *ngIf="cartItems.length > 0">
-            <i class="bi bi-cart-fill"></i> {{ cartItems.length }}
-          </span>
           <button
             class="btn btn-premium btn-sm d-lg-none"
             (click)="toggleCart()"
             [class.active]="!cartCollapsed">
-            <i class="bi bi-cart4"></i> Ver Carrito
+            <i class="bi bi-cart4"></i> Carrito
+            <span class="cart-counter" *ngIf="cartItems.length > 0">{{ cartItems.length }}</span>
           </button>
         </div>
       </div>
@@ -48,175 +26,83 @@
         <!-- 👈 COLUMNA IZQUIERDA: BÚSQUEDA Y PRODUCTOS -->
         <div class="col-12 col-lg-8" [class.collapsed]="cartCollapsed">
 
-          <!-- 📝🔍 DOS COLUMNAS: CLIENTE | BÚSQUEDA -->
-          <div class="row g-3 mb-3">
 
-            <!-- COLUMNA 1: DATOS DEL CLIENTE -->
-            <div class="col-12 col-md-6">
-              <div class="section-card client-section">
-                <div class="section-header">
-                  <h5>
-                    <i class="bi bi-person-circle"></i> Datos del Cliente
-                  </h5>
-                  <span class="badge factura-badge" *ngIf="tipoComprobante === 'factura'">
-                    <i class="bi bi-receipt"></i> Factura
-                  </span>
-                </div>
-
-                <div [formGroup]="formGroup">
-                  <!-- ROW 1: Nombre y Teléfono en 2 columnas -->
-                  <div class="row g-2 mb-3">
-                    <div class="col-6">
-                      <label class="form-label small fw-600">
-                        <i class="bi bi-person"></i> Nombre
-                      </label>
-                      <input
-                        type="text"
-                        class="form-control form-control-sm"
-                        placeholder="Ej: Juan Pérez"
-                        formControlName="clientName" />
-                    </div>
-
-                    <div class="col-6">
-                      <label class="form-label small fw-600">
-                        <i class="bi bi-telephone"></i> Teléfono
-                      </label>
-                      <input
-                        type="tel"
-                        class="form-control form-control-sm"
-                        placeholder="Ej: 0987654321"
-                        formControlName="clientPhone" />
-                    </div>
-                  </div>
-
-                  <!-- ROW 2: Cédula/RUC sola -->
-                  <div class="mb-0">
-                    <label class="form-label small fw-600">
-                      <i class="bi bi-credit-card"></i> Cédula / RUC
-                      <span class="required-mark" *ngIf="tipoComprobante === 'factura'">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      class="form-control form-control-sm"
-                      placeholder="Ej: 1234567890"
-                      formControlName="clientDocument"
-                      maxlength="20" />
-                  </div>
-
-                  <!-- ROW 3: Dirección y Email (solo para factura) -->
-                  <div class="row g-2 mt-1" *ngIf="tipoComprobante === 'factura'">
-                    <div class="col-12">
-                      <label class="form-label small fw-600">
-                        <i class="bi bi-geo-alt"></i> Dirección <span class="required-mark">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        class="form-control form-control-sm"
-                        placeholder="Ej: Quito, Villaflora"
-                        formControlName="clientAddress"
-                        maxlength="300" />
-                    </div>
-                    <div class="col-12">
-                      <label class="form-label small fw-600">
-                        <i class="bi bi-envelope"></i> Email <small class="text-muted">(para enviarle la factura)</small>
-                      </label>
-                      <input
-                        type="email"
-                        class="form-control form-control-sm"
-                        placeholder="Ej: cliente@gmail.com"
-                        formControlName="clientEmail" />
-                    </div>
-                    <small class="factura-hint">
-                      <i class="bi bi-info-circle"></i> Nombre = nombre o razón social que irá en la factura.
-                    </small>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- COLUMNA 2: CARGAR COTIZACIÓN -->
-            <div class="col-12 col-md-6">
-              <div class="section-card quotation-loader-section">
-                <div class="section-header">
-                  <h5>
-                    <i class="bi bi-file-earmark-text"></i> Cargar Cotización
-                  </h5>
-                </div>
-
-                <div class="quotation-loader-body">
-                  <div class="input-group">
-                    <span class="input-group-text bg-transparent">
-                      <i class="bi bi-hash"></i>
-                    </span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Número de cotización (ej: 45231)"
-                      [(ngModel)]="numeroCotizacion"
-                      (keyup.enter)="buscarCotizacion()"
-                      maxlength="10" />
-                    <button
-                      type="button"
-                      class="btn btn-outline-primary"
-                      (click)="buscarCotizacion()"
-                      [disabled]="buscandoCotizacion">
-                      <span *ngIf="buscandoCotizacion" class="spinner-border spinner-border-sm me-1"></span>
-                      <i *ngIf="!buscandoCotizacion" class="bi bi-search me-1"></i>
-                      Buscar
-                    </button>
-                  </div>
-
-                  <!-- RESULTADO DE LA COTIZACIÓN -->
-                  <div *ngIf="cotizacionCargada" class="quotation-result mt-3">
-                    <div class="quotation-result-header">
-                      <span><i class="bi bi-check-circle-fill text-success me-1"></i> Cotización encontrada — {{ cotizacionCargada.length }} producto(s)</span>
-                    </div>
-                    <ul class="quotation-items-preview">
-                      <li *ngFor="let item of cotizacionCargada">
-                        <span class="item-qty">x{{ item.quantity }}</span>
-                        <span class="item-desc">{{ getProductName(item.productId) }}</span>
-                        <span class="item-badge" [class.badge-mayorista]="item.priceType?.toLowerCase() === 'mayorista'">
-                          {{ item.priceType?.toLowerCase() === 'mayorista' ? 'Mayorista' : 'PVP' }}
-                        </span>
-                        <span class="item-price-preview">${{ getPrecioParaCotizacion(item) | number: '1.2-2' }}</span>
-                      </li>
-                    </ul>
-                    <button
-                      type="button"
-                      class="btn btn-success btn-sm w-100 mt-2"
-                      (click)="cargarCotizacionAlCarrito()">
-                      <i class="bi bi-cart-plus me-1"></i> Cargar al Carrito con Precios Actuales
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div><!-- fin row DOS COLUMNAS -->
-
-          <!-- 🔍 BÚSQUEDA DE PRODUCTOS -->
+          <!-- 🔍 BÚSQUEDA DE PRODUCTOS + CARGAR COTIZACIÓN -->
           <div class="section-card search-section mb-3">
-            <div class="section-header">
-              <h5>
-                <i class="bi bi-search"></i> Buscar Productos
-              </h5>
-            </div>
-
-            <div class="search-wrapper" [formGroup]="formGroup">
-              <label class="form-label small fw-600 mb-2">
-                Busca por código o nombre
-              </label>
-              <div class="input-group input-group-lg">
-                <span class="input-group-text bg-transparent border-end-0">
-                  <i class="bi bi-search"></i>
-                </span>
+            <div class="search-bar-row">
+              <div class="search-wrapper flex-grow-1" [formGroup]="formGroup">
+                <i class="bi bi-search search-icon"></i>
                 <input
                   type="text"
-                  class="form-control form-control-lg border-start-0"
-                  placeholder="Ej: laptop, teclado..."
+                  class="search-input"
+                  placeholder="Buscar producto por nombre o código..."
                   formControlName="searchControl"
                   (focus)="onSearchFocus()"
                   autocomplete="off" />
+              </div>
+              <div class="quotation-inline">
+                <div class="quotation-loader-body">
+                    <div class="input-group">
+                      <span class="input-group-text bg-transparent">
+                        <i class="bi bi-hash"></i>
+                      </span>
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Número de cotización (ej: 45231)"
+                        [ngModel]="numeroCotizacion"
+                        (ngModelChange)="onNumeroCotizacionChange($event)"
+                        (focus)="onNumeroCotizacionFocus()"
+                        (blur)="ocultarSugerencias()"
+                        (keyup.enter)="buscarCotizacion()"
+                        (keyup.escape)="mostrarSugerencias = false"
+                        autocomplete="off"
+                        maxlength="10" />
+                      <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        (click)="buscarCotizacion()"
+                        [disabled]="buscandoCotizacion">
+                        <span *ngIf="buscandoCotizacion" class="spinner-border spinner-border-sm me-1"></span>
+                        <i *ngIf="!buscandoCotizacion" class="bi bi-search me-1"></i>
+                        Buscar
+                      </button>
+                    </div>
+
+                    <!-- Sugerencias mientras se escribe -->
+                    <ul class="quote-suggestions" *ngIf="mostrarSugerencias && sugerenciasCotizacion.length && !cotizacionCargada">
+                      <li *ngFor="let c of sugerenciasCotizacion">
+                        <button type="button" (mousedown)="elegirCotizacion(c)">
+                          <span class="q-num"># {{ c.quotationNumber }}</span>
+                          <span class="q-meta">{{ c.createdAt | date:'dd/MM/yyyy' }} · {{ c.itemCount }} producto(s)</span>
+                          <span class="q-total">{{ c.totalAmount | currency:'USD':'symbol':'1.2-2' }}</span>
+                        </button>
+                      </li>
+                    </ul>
+  
+                    <!-- RESULTADO DE LA COTIZACIÓN -->
+                    <div *ngIf="cotizacionCargada" class="quotation-result mt-3">
+                      <div class="quotation-result-header">
+                        <span><i class="bi bi-check-circle-fill text-success me-1"></i> Cotización encontrada — {{ cotizacionCargada.length }} producto(s)</span>
+                      </div>
+                      <ul class="quotation-items-preview">
+                        <li *ngFor="let item of cotizacionCargada">
+                          <span class="item-qty">x{{ item.quantity }}</span>
+                          <span class="item-desc">{{ getProductName(item.productId) }}</span>
+                          <span class="item-badge" [class.badge-mayorista]="item.priceType?.toLowerCase() === 'mayorista'">
+                            {{ item.priceType?.toLowerCase() === 'mayorista' ? 'Mayorista' : 'PVP' }}
+                          </span>
+                          <span class="item-price-preview">${{ getPrecioParaCotizacion(item) | number: '1.2-2' }}</span>
+                        </li>
+                      </ul>
+                      <button
+                        type="button"
+                        class="btn btn-success btn-sm w-100 mt-2"
+                        (click)="cargarCotizacionAlCarrito()">
+                        <i class="bi bi-cart-plus me-1"></i> Cargar al Carrito con Precios Actuales
+                      </button>
+                    </div>
+                  </div>
               </div>
             </div>
           </div>
@@ -433,6 +319,89 @@
               </label>
             </div>
 
+            <!-- 👤 DATOS DEL CLIENTE (junto al cobro) -->
+            <div class="cart-client">
+              <div class="section-card client-section">
+                  <div class="section-header">
+                    <h5>
+                      <i class="bi bi-person-circle"></i> Datos del Cliente
+                    </h5>
+                    <span class="badge factura-badge" *ngIf="tipoComprobante === 'factura'">
+                      <i class="bi bi-receipt"></i> Factura
+                    </span>
+                  </div>
+  
+                  <div [formGroup]="formGroup">
+                    <!-- ROW 1: Nombre y Teléfono en 2 columnas -->
+                    <div class="row g-2 mb-3">
+                      <div class="col-6">
+                        <label class="form-label small fw-600">
+                          <i class="bi bi-person"></i> Nombre
+                        </label>
+                        <input
+                          type="text"
+                          class="form-control form-control-sm"
+                          placeholder="Ej: Juan Pérez"
+                          formControlName="clientName" />
+                      </div>
+  
+                      <div class="col-6">
+                        <label class="form-label small fw-600">
+                          <i class="bi bi-telephone"></i> Teléfono
+                        </label>
+                        <input
+                          type="tel"
+                          class="form-control form-control-sm"
+                          placeholder="Ej: 0987654321"
+                          formControlName="clientPhone" />
+                      </div>
+                    </div>
+  
+                    <!-- ROW 2: Cédula/RUC sola -->
+                    <div class="mb-0">
+                      <label class="form-label small fw-600">
+                        <i class="bi bi-credit-card"></i> Cédula / RUC
+                        <span class="required-mark" *ngIf="tipoComprobante === 'factura'">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        placeholder="Ej: 1234567890"
+                        formControlName="clientDocument"
+                        maxlength="20" />
+                    </div>
+  
+                    <!-- ROW 3: Dirección y Email (solo para factura) -->
+                    <div class="row g-2 mt-1" *ngIf="tipoComprobante === 'factura'">
+                      <div class="col-12">
+                        <label class="form-label small fw-600">
+                          <i class="bi bi-geo-alt"></i> Dirección <span class="required-mark">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          class="form-control form-control-sm"
+                          placeholder="Ej: Quito, Villaflora"
+                          formControlName="clientAddress"
+                          maxlength="300" />
+                      </div>
+                      <div class="col-12">
+                        <label class="form-label small fw-600">
+                          <i class="bi bi-envelope"></i> Email <small class="text-muted">(para enviarle la factura)</small>
+                        </label>
+                        <input
+                          type="email"
+                          class="form-control form-control-sm"
+                          placeholder="Ej: cliente@gmail.com"
+                          formControlName="clientEmail" />
+                      </div>
+                      <small class="factura-hint">
+                        <i class="bi bi-info-circle"></i> Nombre = nombre o razón social que irá en la factura.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
             <!-- 💳 RESUMEN DE COMPRA -->
             <div class="cart-summary" *ngIf="cartItems.length > 0">
               <div class="summary-row">
@@ -463,79 +432,8 @@
               </div>
             </div>
 
-            <!-- 💵 CALCULADORA DE CAMBIO (solo para Efectivo) -->
-            <div class="calculadora-cambio" *ngIf="showCalculadoraCambio">
-              <div class="calc-header">
-                <h6>
-                  <i class="bi bi-calculator"></i> Calculadora de Cambio
-                </h6>
-                <button type="button" class="btn-close-calc" (click)="cerrarCalculadora()">
-                  <i class="bi bi-x-lg"></i>
-                </button>
-              </div>
-
-              <div class="calc-body">
-                <!-- Total a Pagar -->
-                <div class="calc-row total-row">
-                  <span class="calc-label">Total a Pagar:</span>
-                  <span class="calc-value total-value">${{ total | number: '1.2-2' }}</span>
-                </div>
-
-                <!-- Monto Recibido -->
-                <div class="calc-row mb-3">
-                  <label class="calc-label">Recibido del Cliente:</label>
-                  <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input
-                      type="number"
-                      class="form-control form-control-lg text-end"
-                      [(ngModel)]="montoRecibido"
-                      (ngModelChange)="calcularCambio()"
-                      placeholder="0.00"
-                      min="0"
-                      step="0.01" />
-                    <button
-                      type="button"
-                      class="btn btn-outline-danger"
-                      (click)="limpiarMonto()"
-                      title="Limpiar monto">
-                      <i class="bi bi-x-circle"></i>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Botones Rápidos -->
-                <div class="calc-quick-buttons mb-3">
-                  <button type="button" class="btn btn-outline-light btn-sm" (click)="agregarMonto(5)">+ $5</button>
-                  <button type="button" class="btn btn-outline-light btn-sm" (click)="agregarMonto(10)">+ $10</button>
-                  <button type="button" class="btn btn-outline-light btn-sm" (click)="agregarMonto(20)">+ $20</button>
-                  <button type="button" class="btn btn-outline-light btn-sm" (click)="agregarMonto(50)">+ $50</button>
-                  <button type="button" class="btn btn-outline-warning btn-sm" (click)="setMontoExacto()">
-                    <i class="bi bi-check2"></i> Exacto
-                  </button>
-                </div>
-
-                <!-- Cambio/Vuelto -->
-                <div class="calc-row cambio-row" [class.negative]="cambio < 0">
-                  <span class="calc-label">{{ cambio >= 0 ? 'Cambio a Devolver:' : 'Falta:' }}</span>
-                  <span class="calc-value cambio-value">
-                    ${{ (cambio >= 0 ? cambio : -cambio) | number: '1.2-2' }}
-                  </span>
-                </div>
-
-                <!-- Botón Confirmar -->
-                <button
-                  type="button"
-                  class="btn btn-success btn-lg w-100 mt-3"
-                  (click)="procesarCobroEfectivo()"
-                  [disabled]="montoRecibido < total">
-                  <i class="bi bi-cash-coin"></i> Guardar en Caja y Finalizar
-                </button>
-              </div>
-            </div>
-
             <!-- 🎯 BOTONES DE ACCIÓN -->
-            <div class="cart-actions" *ngIf="!showCalculadoraCambio">
+            <div class="cart-actions">
               <button
                 type="button"
                 class="btn btn-danger btn-sm w-100 mb-2"
