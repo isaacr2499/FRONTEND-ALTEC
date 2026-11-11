@@ -89,8 +89,9 @@
                         <li *ngFor="let item of cotizacionCargada">
                           <span class="item-qty">x{{ item.quantity }}</span>
                           <span class="item-desc">{{ getProductName(item.productId) }}</span>
-                          <span class="item-badge" [class.badge-mayorista]="item.priceType?.toLowerCase() === 'mayorista'">
-                            {{ item.priceType?.toLowerCase() === 'mayorista' ? 'Mayorista' : 'PVP' }}
+                          <span class="item-badge" [class.badge-mayorista]="item.priceType?.toLowerCase() === 'mayorista'"
+                                [class.badge-manual]="item.priceType?.toLowerCase() === 'manual'">
+                            {{ item.priceType?.toLowerCase() === 'mayorista' ? 'Mayorista' : item.priceType?.toLowerCase() === 'manual' ? 'Proforma' : 'PVP' }}
                           </span>
                           <span class="item-price-preview">${{ getPrecioParaCotizacion(item) | number: '1.2-2' }}</span>
                         </li>
@@ -99,7 +100,7 @@
                         type="button"
                         class="btn btn-success btn-sm w-100 mt-2"
                         (click)="cargarCotizacionAlCarrito()">
-                        <i class="bi bi-cart-plus me-1"></i> Cargar al Carrito con Precios Actuales
+                        <i class="bi bi-cart-plus me-1"></i> Cargar al Carrito
                       </button>
                     </div>
                   </div>
@@ -250,7 +251,14 @@
 
                 <div class="item-price-info">
                   <div class="d-flex align-items-center gap-2">
-                    <span class="unit-price">${{ item.pvp | number: '1.2-2' }} c/u</span>
+                    <span class="unit-price price-edit" [class.manual]="item.precioManual"
+                          [title]="item.precioManual ? 'Precio solo para esta venta (sistema: $' + (item.precioOriginal | number:'1.2-2') + ')' : 'Puedes cambiar el precio solo para esta venta'">
+                      <span>$</span>
+                      <input type="number" min="0" step="0.01" [value]="item.pvp" (change)="setPrecioCarrito(item, $event)">
+                      <span class="cu">c/u</span>
+                      <button type="button" class="price-reset" *ngIf="item.precioManual" (click)="restaurarPrecioCarrito(item)"
+                              title="Volver al precio del sistema"><i class="bi bi-arrow-counterclockwise"></i></button>
+                    </span>
                     <span class="price-type-badge" [class.mayorista-badge]="item.priceType === 'mayorista'">
                       {{ item.priceType === 'mayorista' ? 'Mayorista' : 'PVP' }}
                     </span>

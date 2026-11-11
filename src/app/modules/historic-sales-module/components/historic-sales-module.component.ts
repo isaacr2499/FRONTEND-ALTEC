@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SalesService } from '../../../services/sales.service';
 import { ProductService } from '../../warehouse/services/warehouse.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { ElectronicInvoiceService, ElectronicInvoiceListItem } from '../../../services/electronic-invoice.service';
 import Notiflix from 'notiflix';
 
 interface HistoricSaleRow {
@@ -15,6 +17,8 @@ interface HistoricSaleRow {
     itemCount: number;
     sales: any[];
     cancelled: boolean;
+    /** Factura electrónica emitida para esta venta (si no hay, es un recibo). */
+    factura?: { numero: string; estado: string };
 }
 
 @Component({
@@ -36,7 +40,13 @@ export class HistoricSalesModuleComponent implements OnInit {
     // KPIs
     totalVentas: number = 0;
     totalGanancia: number = 0;
-    totalFacturas: number = 0;
+    totalFacturas: number = 0;   // ventas aprobadas (no canceladas)
+    totalConFactura: number = 0;
+    totalRecibos: number = 0;
+
+    // Facturas electrónicas por número de venta
+    private facturasPorVenta = new Map<string, { numero: string; estado: string }>();
+    tipoFiltro: '' | 'factura' | 'recibo' = '';
     margen: number = 0;
 
     // Pagination
@@ -55,10 +65,15 @@ export class HistoricSalesModuleComponent implements OnInit {
     selectedSale: HistoricSaleRow | null = null;
     allProducts: any[] = [];
 
-    constructor(private salesService: SalesService, private productService: ProductService) { }
+    constructor(
+        private salesService: SalesService,
+        private productService: ProductService,
+        private einvService: ElectronicInvoiceService
+    ) { }
 
     ngOnInit(): void {
         this.loadHistoricSales();
+        this.loadFacturasElectronicas();
         this.productService.getProducts(1, 1000, '', 'descripcion', 'asc').subscribe({
             next: (data: any) => { this.allProducts = data.items || []; },
             error: () => {}
@@ -135,6 +150,43 @@ export class HistoricSalesModuleComponent implements OnInit {
         );
     }
 
+    /** Carga todas las facturas electrónicas (páginas de 100) para saber qué ventas se facturaron. */
+    private loadFacturasElectronicas(): void {
+        const pageSize = 100;
+        this.einvService.listar({ page: 1, pageSize }).pipe(
+            switchMap(first => {
+                const pages = Math.ceil((first.total || 0) / pageSize);
+                const rest = [];
+                for (let p = 2; p <= pages; p++) rest.push(this.einvService.listar({ page: p, pageSize }));
+                return rest.length
+                    ? forkJoin(rest).pipe(map(r => [first, ...r].flatMap(x => x.items)))
+                    : of(first.items);
+            }),
+            catchError(() => of([] as ElectronicInvoiceListItem[]))
+        ).subscribe(items => {
+            this.facturasPorVenta.clear();
+            items
+                .filter(f => f.saleInvoiceNumber && f.estado !== 'DEVUELTA' && f.estado !== 'NO AUTORIZADO')
+                .forEach(f => {
+                    // Si una venta tiene varias, gana la que no está anulada
+                    const prev = this.facturasPorVenta.get(f.saleInvoiceNumber!);
+                    if (!prev || prev.estado === 'ANULADA') {
+                        this.facturasPorVenta.set(f.saleInvoiceNumber!, { numero: f.numeroFactura, estado: f.estado });
+                    }
+                });
+            this.historicSales.forEach(h => h.factura = this.facturasPorVenta.get(h.invoiceNumber));
+            this.filterSales();
+        });
+    }
+
+    estadoFactura(estado: string): { label: string; css: string } {
+        switch (estado) {
+            case 'AUTORIZADO': return { label: 'Autorizada', css: 'ok' };
+            case 'ANULADA': return { label: 'Anulada', css: 'anulada' };
+            default: return { label: 'Pendiente SRI', css: 'pendiente' };
+        }
+    }
+
     loadHistoricSales(): void {
         this.isLoading = true;
         Notiflix.Loading.standard('Cargando historial...');
@@ -186,7 +238,8 @@ export class HistoricSalesModuleComponent implements OnInit {
                     date: saleDate,
                     dateStr: saleDate ? new Date(saleDate).toLocaleDateString() : 'N/A',
                     sales: salesArr,
-                    cancelled: isCancelled
+                    cancelled: isCancelled,
+                    factura: this.facturasPorVenta.get(invoice)
                 });
             }
         });
@@ -209,9 +262,12 @@ export class HistoricSalesModuleComponent implements OnInit {
             temp = temp.filter(s => new Date(s.date).getTime() <= eDate);
         }
         if (this.searchQuery) {
-            const query = this.searchQuery.toLowerCase();
-            temp = temp.filter(s => s.invoiceNumber.toLowerCase().includes(query));
+            const query = this.searchQuery.toLowerCase().trim();
+            temp = temp.filter(s => s.invoiceNumber.toLowerCase().includes(query)
+                || (s.factura?.numero || '').toLowerCase().includes(query));
         }
+        if (this.tipoFiltro === 'factura') temp = temp.filter(s => !!s.factura);
+        if (this.tipoFiltro === 'recibo') temp = temp.filter(s => !s.factura);
 
         this.filteredSales = temp;
         this.generateChartData();
@@ -269,7 +325,10 @@ export class HistoricSalesModuleComponent implements OnInit {
         // KPIs
         this.totalVentas   = this.filteredSales.reduce((s, r) => s + r.totalAmount, 0);
         this.totalGanancia = this.filteredSales.reduce((s, r) => s + r.totalProfit, 0);
-        this.totalFacturas = this.filteredSales.length;
+        const aprobadas = this.filteredSales.filter(s => !s.cancelled);
+        this.totalFacturas   = aprobadas.length;
+        this.totalConFactura = aprobadas.filter(s => !!s.factura).length;
+        this.totalRecibos    = this.totalFacturas - this.totalConFactura;
         this.margen = this.totalVentas > 0 ? (this.totalGanancia / this.totalVentas) * 100 : 0;
     }
 
@@ -290,6 +349,7 @@ export class HistoricSalesModuleComponent implements OnInit {
         this.startDate = '';
         this.endDate = '';
         this.searchQuery = '';
+        this.tipoFiltro = '';
         this.filterSales();
     }
 }

@@ -397,6 +397,38 @@ export class ProductQuoteComponent implements OnInit {
     }
   }
 
+  /**
+   * Cambia el precio unitario SOLO en esta cotización (proforma). No modifica el PVP del producto:
+   * cada línea de la cotización es una copia del producto.
+   */
+  setPrecio(index: number, event: any): void {
+    const item = this.cotizacion[index];
+    const input = event?.target as HTMLInputElement;
+    const valor = Math.round(parseFloat(String(input?.value ?? '').replace(',', '.')) * 100) / 100;
+    if (!isFinite(valor) || valor < 0) {
+      if (input) input.value = String(item.precio);
+      return;
+    }
+    if (item.precioOriginal === undefined) item.precioOriginal = item.precio;
+    item.precio = valor;
+    item.precioManual = valor !== item.precioOriginal;
+    item.total = item.cantidad * valor;
+  }
+
+  /** Vuelve al precio del sistema (PVP o mayorista) en esa línea. */
+  restaurarPrecio(index: number): void {
+    const item = this.cotizacion[index];
+    if (item.precioOriginal === undefined) return;
+    item.precio = item.precioOriginal;
+    item.precioManual = false;
+    item.total = item.cantidad * item.precio;
+  }
+
+  /** Las líneas con precio cambiado a mano se guardan como "manual" para respetarlo al volver a cargar. */
+  private tipoPrecioGuardado(item: any): string {
+    return item.precioManual ? 'manual' : (item.priceType || 'pvp');
+  }
+
   get totalCotizacion(): number {
     return this.cotizacion.reduce((acc, item) => acc + item.total, 0);
   }
@@ -410,7 +442,7 @@ export class ProductQuoteComponent implements OnInit {
       productId: product.id,
       quantity: product.cantidad,
       unitPrice: product.precio,
-      priceType: product.priceType || 'pvp'
+      priceType: this.tipoPrecioGuardado(product)
     }));
 
     let quotationNumber: string;
@@ -724,14 +756,19 @@ export class ProductQuoteComponent implements OnInit {
 
       // Usar el tipo de precio original (mayorista o pvp) con el valor ACTUAL del producto
       const esMayorista = item.priceType === 'mayorista';
-      const precio = esMayorista ? product.precioMayorista : product.pvp;
+      const precioSistema = esMayorista ? product.precioMayorista : product.pvp;
+      // Precio puesto a mano en la cotización: se respeta el guardado
+      const esManual = item.priceType === 'manual';
+      const precio = esManual ? Number(item.unitPrice) : precioSistema;
       const total = item.quantity * precio;
 
       const nuevoItem: any = {
         ...product,
         cantidad: item.quantity,
         precio: precio,
-        priceType: item.priceType || 'pvp',
+        priceType: esManual ? 'pvp' : (item.priceType || 'pvp'),
+        precioOriginal: precioSistema,
+        precioManual: esManual && precio !== precioSistema,
         total: total,
         fotoBase64: null
       };
@@ -760,7 +797,7 @@ export class ProductQuoteComponent implements OnInit {
       productId: product.id,
       quantity: product.cantidad,
       unitPrice: product.precio,
-      priceType: product.priceType || 'pvp'
+      priceType: this.tipoPrecioGuardado(product)
     }));
 
     Notiflix.Loading.standard('Guardando cambios...');
@@ -788,7 +825,7 @@ export class ProductQuoteComponent implements OnInit {
       productId: product.id,
       quantity: product.cantidad,
       unitPrice: product.precio,
-      priceType: product.priceType || 'pvp'
+      priceType: this.tipoPrecioGuardado(product)
     }));
 
     let quotationNumber: string;

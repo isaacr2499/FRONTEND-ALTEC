@@ -2647,3 +2647,78 @@ $v-border: rgba(139, 80, 251, 0.2);
 }
 
 .quote-suggestions { z-index: 100; }
+
+// Precio unitario editable solo para esta venta (no cambia el PVP del producto)
+.price-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.3rem 0.1rem 0.55rem;
+  border: 1.5px solid rgba(96, 165, 250, 0.35);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #E6EDF3;
+
+  &:focus-within { border-color: #60A5FA; box-shadow: 0 0 10px rgba(96, 165, 250, 0.35); }
+
+  input {
+    width: 62px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #fff;
+    font-weight: 700;
+    text-align: right;
+    -moz-appearance: textfield;
+    appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  }
+
+  .cu { font-size: 0.75rem; color: #8B949E; }
+
+  // Precio cambiado a mano: dorado
+  &.manual {
+    border-color: rgba(251, 191, 36, 0.7);
+    background: rgba(251, 191, 36, 0.1);
+
+    input, > span:first-child { color: #fbbf24; }
+  }
+}
+
+.price-reset {
+  border: none;
+  background: none;
+  padding: 0 0.1rem;
+  color: #fbbf24;
+  line-height: 1;
+
+  &:hover { color: #fff; }
+}
+
+.item-badge.badge-manual {
+  background: rgba(251, 191, 36, 0.15) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(251, 191, 36, 0.5);
+}
+
+// Más espacio para ver los productos del carrito mientras se agregan
+@media (min-width: 992px) {
+  .cart-sidebar .cart-items-container {
+    min-height: 420px !important;
+    max-height: 72vh !important;
+  }
+}
+
+.cart-sidebar .cart-items-container {
+  padding: 0.6rem 0.75rem !important;
+
+  // Tarjetas de producto más compactas para que entren más a la vez
+  .cart-item {
+    padding: 0.6rem 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .item-name { font-size: 0.88rem !important; }
+}

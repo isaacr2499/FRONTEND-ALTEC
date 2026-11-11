@@ -19,7 +19,9 @@ import Notiflix from 'notiflix';
 interface CartItem {
   id?: string;
   descripcion: string;
-  pvp: number;
+  pvp: number;              // precio unitario de ESTA venta (puede cambiarse sin tocar el PVP del producto)
+  precioOriginal?: number;  // precio del sistema al agregarlo
+  precioManual?: boolean;   // true si se cambió a mano
   priceType: string;
   cantidad: number;
   subtotal?: number;
@@ -422,6 +424,7 @@ export class SalesModuleComponent implements OnInit {
         id: productId,
         descripcion: product.descripcion,
         pvp: precio,
+        precioOriginal: precio,
         priceType: priceType,
         cantidad: 1
       });
@@ -503,6 +506,31 @@ export class SalesModuleComponent implements OnInit {
     this.cartItems.forEach(item => {
       item.subtotal = item.pvp * item.cantidad;
     });
+  }
+
+  /**
+   * Cambia el precio unitario SOLO en esta venta. El PVP del producto no se toca:
+   * cada línea del carrito tiene su propio precio, que es el que se guarda en la venta,
+   * en la ganancia y en la factura.
+   */
+  setPrecioCarrito(item: any, event: any): void {
+    const input = event?.target as HTMLInputElement;
+    const valor = Math.round(parseFloat(String(input?.value ?? '').replace(',', '.')) * 100) / 100;
+    if (!isFinite(valor) || valor < 0) {
+      if (input) input.value = String(item.pvp);
+      return;
+    }
+    if (item.precioOriginal === undefined) item.precioOriginal = item.pvp;
+    item.pvp = valor;
+    item.precioManual = valor !== item.precioOriginal;
+    this.recalculate();
+  }
+
+  restaurarPrecioCarrito(item: any): void {
+    if (item.precioOriginal === undefined) return;
+    item.pvp = item.precioOriginal;
+    item.precioManual = false;
+    this.recalculate();
   }
 
   getTotal(): number {
@@ -637,6 +665,8 @@ export class SalesModuleComponent implements OnInit {
   getPrecioParaCotizacion(item: any): number {
     const product = this.allProducts.find(p => p.id === item.productId);
     if (!product) return item.unitPrice ?? 0;
+    // Precio puesto a mano en el cotizador: se respeta
+    if ((item.priceType ?? '').toLowerCase() === 'manual') return Number(item.unitPrice) || 0;
     const esMayorista = (item.priceType ?? '').toLowerCase() === 'mayorista';
     return esMayorista && product.precioMayorista > 0
       ? product.precioMayorista
@@ -651,12 +681,17 @@ export class SalesModuleComponent implements OnInit {
       const product = this.allProducts.find(p => p.id === item.productId);
       if (!product) continue;
 
-      const esMayorista = (item.priceType ?? '').toLowerCase() === 'mayorista';
-      const precio = esMayorista && product.precioMayorista > 0
+      const tipo = (item.priceType ?? '').toLowerCase();
+      const esMayorista = tipo === 'mayorista';
+      const esManual = tipo === 'manual';
+      const precioSistema = esMayorista && product.precioMayorista > 0
         ? product.precioMayorista
         : product.pvp;
+      // Si en el cotizador se cambió el precio, la venta usa ese precio
+      const precio = esManual ? (Number(item.unitPrice) || precioSistema) : precioSistema;
+      const tipoCarrito = esMayorista ? 'mayorista' : 'pvp';
 
-      const existing = this.cartItems.find(c => c.id === product.id && c.priceType === (esMayorista ? 'mayorista' : 'pvp'));
+      const existing = this.cartItems.find(c => c.id === product.id && c.priceType === tipoCarrito && c.pvp === precio);
       if (existing) {
         existing.cantidad += item.quantity;
       } else {
@@ -664,7 +699,9 @@ export class SalesModuleComponent implements OnInit {
           id: product.id,
           descripcion: product.descripcion,
           pvp: precio,
-          priceType: item.priceType || 'pvp',
+          precioOriginal: precioSistema,
+          precioManual: precio !== precioSistema,
+          priceType: tipoCarrito,
           cantidad: item.quantity
         });
       }

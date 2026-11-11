@@ -1,312 +1,211 @@
-// ============================================
-// 🎨 PALETA DE COLORES PROFESIONAL
-// ============================================
-
-$primary-color: #6c5ce7;
-$primary-light: #a29bfe;
-$secondary-color: #00b894;
-$secondary-light: #55efc4;
-$danger-color: #d63031;
-$dark-bg: #1a1a2e;
-$card-bg: #16213e;
+// Misma paleta que Bodega, Ventas y Facturas Electrónicas
+$primary-color: #8B50FB;
+$primary-light: #A78BFA;
+$secondary-color: #10B981;
+$secondary-light: #34D399;
+$danger-color: #EF4444;
+$card-bg: rgba(255, 255, 255, 0.03);
 $text-primary: #ffffff;
-$text-secondary: #b8bec3;
-$border-color: #2d3561;
-
-// ============================================
-// 🎯 CONTAINER PRINCIPAL
-// ============================================
+$text-secondary: #8B949E;
+$border-color: rgba(139, 80, 251, 0.2);
 
 .historic-container {
-    background: linear-gradient(135deg, $dark-bg 0%, #0f3460 100%);
+    background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
     min-height: 100vh;
     color: $text-primary;
-    font-family: 'Montserrat', -apple-system, sans-serif;
+    padding-bottom: 2rem;
 }
 
-// ============================================
-// 📱 HEADER
-// ============================================
-
 .historic-header {
-    background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
-    padding: 1.5rem 0;
-    box-shadow: 0 8px 32px rgba(108, 92, 231, 0.2);
-    border-bottom: 3px solid $secondary-color;
-    margin-bottom: 2rem;
-
-    .header-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+    padding: 1.5rem 0 0.5rem;
+    margin-bottom: 1rem;
 
     .historic-title {
-        font-size: 1.8rem;
-        font-weight: 900;
+        font-family: 'Acephimere', sans-serif;
+        font-size: 2.2rem;
+        font-weight: 800;
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 0.8rem;
-
-        i {
-            font-size: 2rem;
-        }
-    }
-
-    .header-subtitle {
-        font-size: 0.85rem;
-        opacity: 0.9;
-        margin: 0.3rem 0 0.2rem 0;
+        gap: 0.7rem;
+        color: #fff;
+        text-shadow: 0 0 20px rgba(139, 80, 251, 0.3);
     }
 }
 
-// ============================================
-// 🎴 SECTION CARDS
-// ============================================
-
-.section-card {
+// ---------- Tarjetas ----------
+.hs-card {
     background: $card-bg;
     border: 1px solid $border-color;
-    border-radius: 14px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
+    border-radius: 15px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
 
-    &:hover {
-        box-shadow: 0 8px 32px rgba(108, 92, 231, 0.15);
-        border-color: $primary-color;
-    }
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid $border-color;
 
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid $border-color;
-
-        h5 {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 700;
-
-            i {
-                color: $primary-color;
-                margin-right: 0.5rem;
-            }
-        }
+    h5 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        i { color: $primary-light; margin-right: 0.4rem; }
     }
 }
 
-// ============================================
-// 🔍 FILTERS
-// ============================================
-
-.filters-section {
-    .filters-body { display: flex; flex-direction: column; }
-
-    .filter-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.65rem;
-    }
-
-    .filter-field, .filter-search {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-
-        label {
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: $text-secondary;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 4px;
-            i { color: $primary-color; }
-        }
-    }
-
-    .filter-input {
-        background: rgba(255,255,255,0.06);
-        border: 1px solid $border-color;
-        color: $text-primary;
-        border-radius: 8px !important;
-        font-size: 0.82rem;
-        transition: all 0.2s;
-
-        &:focus {
-            background: rgba(108,92,231,0.1);
-            border-color: $primary-color;
-            box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
-            color: $text-primary;
-        }
-
-        &::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
-    }
-
-    .filter-input-icon {
-        background: rgba(108,92,231,0.12);
-        border: 1px solid $border-color;
-        border-right: none;
-        color: $primary-light;
-    }
-
-    .filter-clear-btn {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid $border-color;
-        border-left: none;
-        color: $text-secondary;
-        padding: 0 8px;
-        transition: color 0.2s;
-        &:hover { color: $danger-color; }
-    }
-
-    .filter-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 0.75rem;
-    }
-
-    .filter-count {
-        font-size: 0.75rem;
-        color: $text-secondary;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid $border-color;
-        border-radius: 6px;
-        padding: 3px 10px;
-    }
-
-    .btn-filter-clear {
-        background: rgba(214,48,49,0.12);
-        border: 1px solid rgba(214,48,49,0.35);
-        color: #ff7675;
-        border-radius: 8px;
-        padding: 4px 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        &:hover { background: rgba(214,48,49,0.28); color: #fff; }
-    }
-}
-
-// ============================================
-// 📊 KPI CARDS
-// ============================================
-
+// ---------- KPIs ----------
 .kpi-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.65rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    @media (max-width: 991px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .kpi-card {
-    border-radius: 12px;
-    padding: 0.9rem 1rem;
+    background: $card-bg;
+    border: 1px solid $border-color;
+    border-radius: 15px;
+    padding: 0.85rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    border: 1px solid transparent;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, border-color 0.2s;
 
-    &:hover {
-        transform: translateY(-2px);
-    }
+    &:hover { transform: translateY(-2px); border-color: rgba(139, 80, 251, 0.45); }
 
     .kpi-icon {
-        font-size: 1.4rem;
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
+        font-size: 1.3rem;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
     }
 
-    .kpi-body {
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-    }
+    .kpi-body { display: flex; flex-direction: column; min-width: 0; }
 
     .kpi-label {
-        font-size: 0.68rem;
+        font-size: 0.7rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        opacity: 0.75;
+        color: $text-secondary;
     }
 
     .kpi-value {
-        font-size: 1rem;
+        font-size: 1.25rem;
         font-weight: 800;
+        color: #fff;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    &.kpi-ventas {
-        background: linear-gradient(135deg, rgba(108,92,231,0.18) 0%, rgba(162,155,254,0.1) 100%);
-        border-color: rgba(108,92,231,0.35);
-        color: $primary-light;
-        .kpi-icon { background: rgba(108,92,231,0.25); color: $primary-light; }
+    .kpi-sub { font-size: 0.72rem; color: $text-secondary; }
+
+    &.kpi-ventas   .kpi-icon { background: rgba(139, 80, 251, 0.2);  color: $primary-light; }
+    &.kpi-ganancia .kpi-icon { background: rgba(16, 185, 129, 0.2);  color: $secondary-light; }
+    &.kpi-margen   .kpi-icon { background: rgba(253, 203, 110, 0.18); color: #fdcb6e; }
+    &.kpi-facturas .kpi-icon { background: rgba(96, 165, 250, 0.18);  color: #60A5FA; }
+}
+
+// ---------- Filtros ----------
+.hs-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+
+    .filter {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        min-width: 140px;
+        &.grow { flex: 1; min-width: 200px; }
     }
 
-    &.kpi-ganancia {
-        background: linear-gradient(135deg, rgba(0,184,148,0.18) 0%, rgba(85,239,196,0.1) 100%);
-        border-color: rgba(0,184,148,0.35);
-        color: $secondary-light;
-        .kpi-icon { background: rgba(0,184,148,0.25); color: $secondary-light; }
+    label { color: #60A5FA; font-size: 0.8rem; font-weight: 600; }
+
+    .form-control,
+    .form-select {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(139, 80, 251, 0.3);
+        border-radius: 50px;
+        color: $text-primary;
+        color-scheme: dark;
+        padding: 0.45rem 1rem;
+
+        &::placeholder { color: rgba(255, 255, 255, 0.4); }
+
+        &:focus {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: $primary-color;
+            box-shadow: 0 0 20px rgba(139, 80, 251, 0.4);
+            color: $text-primary;
+        }
     }
 
-    &.kpi-margen {
-        background: linear-gradient(135deg, rgba(253,203,110,0.18) 0%, rgba(253,203,110,0.08) 100%);
-        border-color: rgba(253,203,110,0.35);
-        color: #fdcb6e;
-        .kpi-icon { background: rgba(253,203,110,0.2); color: #fdcb6e; }
-    }
+    .form-select option { background: #1a2332; }
 
-    &.kpi-facturas {
-        background: linear-gradient(135deg, rgba(116,185,255,0.18) 0%, rgba(116,185,255,0.08) 100%);
-        border-color: rgba(116,185,255,0.35);
-        color: #74b9ff;
-        .kpi-icon { background: rgba(116,185,255,0.2); color: #74b9ff; }
+    .btn-limpiar {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.45rem 1.1rem;
+        border: 2px solid $primary-color;
+        border-radius: 25px;
+        background: rgba(139, 80, 251, 0.2);
+        color: #fff;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        &:hover { background: $primary-color; transform: translateY(-2px); }
     }
 }
 
-// ============================================
-// 📊 CHART TOGGLE & LEGEND
-// ============================================
+.hs-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: $text-secondary;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
 
+.empty {
+    text-align: center;
+    color: $text-secondary;
+    padding: 2rem;
+    font-size: 0.85rem;
+}
+
+// ---------- Gráfica: selector y leyenda ----------
 .chart-toggle {
     display: flex;
     gap: 4px;
 
     button {
-        background: rgba(255,255,255,0.06);
+        background: rgba(255, 255, 255, 0.05);
         border: 1px solid $border-color;
         color: $text-secondary;
-        border-radius: 6px;
-        padding: 3px 10px;
+        border-radius: 20px;
+        padding: 3px 12px;
         font-size: 0.72rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
 
-        &:hover { background: rgba(108,92,231,0.2); color: $primary-light; }
-
-        &.active {
-            background: $primary-color;
-            border-color: $primary-color;
-            color: #fff;
-        }
+        &:hover { background: rgba(139, 80, 251, 0.2); color: $primary-light; }
+        &.active { background: $primary-color; border-color: $primary-color; color: #fff; }
     }
 }
 
@@ -324,8 +223,7 @@ $border-color: #2d3561;
     height: 10px;
     border-radius: 3px;
     display: inline-block;
-
-    &.legend-ventas  { background: $primary-color; }
+    &.legend-ventas   { background: $primary-color; }
     &.legend-ganancia { background: $secondary-color; }
 }
 
@@ -437,7 +335,7 @@ $border-color: #2d3561;
 
     &.bar-ventas {
         background: linear-gradient(180deg, $primary-light 0%, $primary-color 100%);
-        box-shadow: 0 -2px 8px rgba(108,92,231,0.4);
+        box-shadow: 0 -2px 8px rgba(139,80,251,0.4);
     }
 
     &.bar-ganancia {
@@ -477,8 +375,8 @@ $border-color: #2d3561;
     width: 100%;
     margin-top: 10px;
     padding: 5px 12px;
-    background: rgba(108,92,231,0.12);
-    border: 1px solid rgba(108,92,231,0.28);
+    background: rgba(139,80,251,0.12);
+    border: 1px solid rgba(139,80,251,0.28);
     border-radius: 8px;
     color: $primary-light;
     font-size: 0.72rem;
@@ -488,7 +386,7 @@ $border-color: #2d3561;
     text-align: center;
 
     &:hover {
-        background: rgba(108,92,231,0.28);
+        background: rgba(139,80,251,0.28);
         border-color: $primary-color;
     }
 }
@@ -510,7 +408,7 @@ $border-color: #2d3561;
 }
 
 .chart-modal-box {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: linear-gradient(135deg, #0f1e30 0%, #1a2332 100%);
     border: 1px solid $border-color;
     border-radius: 16px;
     width: 100%;
@@ -591,88 +489,104 @@ $border-color: #2d3561;
     opacity: 1 !important;
 }
 
-// ============================================
-// 📋 TABLE
-// ============================================
-
+// ---------- Tabla ----------
 .history-table-container {
-    max-height: 600px;
-    overflow-y: auto;
+    max-height: 70vh;
+    overflow: auto;
 
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 3px;
-    }
+    &::-webkit-scrollbar { width: 6px; height: 6px; }
+    &::-webkit-scrollbar-thumb { background: rgba(139, 80, 251, 0.3); border-radius: 3px; }
 }
 
-.custom-table {
-    background: transparent !important;
-    margin-bottom: 0;
+.hs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    min-width: 640px;
 
-    thead th {
-        background: rgba(255, 255, 255, 0.05);
-        border-bottom: 2px solid $border-color;
-        color: $text-secondary;
-        font-size: 0.8rem;
+    th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #142033;
+        text-align: left;
+        font-size: 0.72rem;
         text-transform: uppercase;
-        font-weight: 700;
-        padding: 1rem;
-        white-space: nowrap;
+        letter-spacing: 0.5px;
+        color: $text-secondary;
+        padding: 0.6rem 0.5rem;
+        border-bottom: 2px solid $border-color;
     }
 
-    tbody {
-        tr {
-            transition: all 0.2s ease;
-            cursor: pointer;
-
-            &:hover {
-                background: rgba(255, 255, 255, 0.03);
-                transform: scale(1.01);
-            }
-        }
-
-        td {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            color: $text-primary;
-            font-size: 0.9rem;
-            background: transparent !important;
-        }
+    td {
+        padding: 0.55rem 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        vertical-align: middle;
     }
 
-    .text-muted {
-        color: #a29bfe !important; // Un lila claro para que sea legible pero secundario
-    }
-
-    .invoice-badge {
-        background: rgba(108, 92, 231, 0.2);
-        color: $primary-light;
-        padding: 0.3rem 0.6rem;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        font-family: monospace;
-        font-weight: 600;
-    }
+    .num { text-align: right; }
 }
-// ============================================
-// 🖱️ FILA CLICKEABLE
-// ============================================
+
+.bold { font-weight: 700; }
+
+.muted {
+    color: $text-secondary;
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 2px;
+}
+
+.invoice-badge {
+    background: rgba(139, 80, 251, 0.15);
+    color: $primary-light;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-family: monospace;
+    font-weight: 600;
+}
+
+.monto-venta    { color: $secondary-light; font-weight: 700; }
+.monto-ganancia { color: #fdcb6e; font-weight: 700; }
+.tachado        { color: $text-secondary; text-decoration: line-through; }
+
+.tipo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+
+    &.tipo-factura { background: rgba(96, 165, 250, 0.15); color: #60A5FA; }
+    &.tipo-recibo  { background: rgba(178, 190, 195, 0.12); color: #b2bec3; }
+}
+
+.mini-estado {
+    &.anulada   { color: #ff7675; }
+    &.pendiente { color: #fdcb6e; }
+}
+
+.estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+
+    &.ok      { background: rgba(0, 184, 148, 0.15); color: #55efc4; }
+    &.anulada { background: rgba(239, 68, 68, 0.15); color: #ff7675; }
+}
 
 .sale-row-clickable {
     cursor: pointer;
     transition: background 0.15s;
-
-    &:hover td {
-        background: rgba(108, 92, 231, 0.12) !important;
-    }
+    &:hover td { background: rgba(139, 80, 251, 0.08); }
 }
 
 // ============================================
@@ -698,8 +612,8 @@ $border-color: #2d3561;
 }
 
 .detail-modal-box {
-    background: #16213e;
-    border: 1px solid #2d3561;
+    background: linear-gradient(135deg, #0f1e30 0%, #1a2332 100%);
+    border: 1px solid rgba(139, 80, 251, 0.3);
     border-radius: 16px;
     width: 100%;
     max-width: 680px;
@@ -722,8 +636,8 @@ $border-color: #2d3561;
     justify-content: space-between;
     align-items: flex-start;
     padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #2d3561;
-    background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+    border-bottom: 1px solid rgba(139,80,251,0.2);
+    background: linear-gradient(135deg, #8B50FB 0%, #A78BFA 100%);
 
     h4 {
         margin: 0 0 0.4rem;
@@ -773,7 +687,7 @@ $border-color: #2d3561;
 
     &::-webkit-scrollbar { width: 6px; }
     &::-webkit-scrollbar-track { background: transparent; }
-    &::-webkit-scrollbar-thumb { background: #2d3561; border-radius: 4px; }
+    &::-webkit-scrollbar-thumb { background: rgba(139,80,251,0.2); border-radius: 4px; }
 }
 
 .detail-product-item {
@@ -793,7 +707,7 @@ $border-color: #2d3561;
     border-radius: 10px;
     overflow: hidden;
     background: rgba(255,255,255,0.05);
-    border: 1px solid #2d3561;
+    border: 1px solid rgba(139,80,251,0.2);
 
     img {
         width: 100%;
@@ -807,7 +721,7 @@ $border-color: #2d3561;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #6c5ce7;
+        color: #8B50FB;
         font-size: 1.6rem;
     }
 }
@@ -863,7 +777,7 @@ $border-color: #2d3561;
 // --- Footer ---
 .detail-modal-footer {
     padding: 1rem 1.5rem;
-    border-top: 1px solid #2d3561;
+    border-top: 1px solid rgba(139,80,251,0.2);
     background: rgba(255,255,255,0.03);
     display: flex;
     justify-content: space-between;
