@@ -90,10 +90,14 @@ export class InventarioComponent implements OnInit, OnDestroy {
       nombre,
       '',
       '✅ Nuevo, probado antes de entregar',
-      '📍 Quito – retiro en local y envíos a todo Ecuador',
-      '🚚 Compras sobre $20: cubrimos hasta $3 de envío',
+      '🚚 Envíos a todo Ecuador. Compras sobre $20: cubrimos hasta $3 de envío',
+      '',
+      '🏪 Local: La Villaflora, Av. Rodrigo de Chávez, Quito',
+      '📍 Retiro en bodega: Quito Sur, Rafael Ferrer y Bartolomé Pérez',
+      '🌐 Mira todo nuestro catálogo en www.altecmec.com',
+      '',
       '🛠️ ¿Necesitas ayuda con tu proyecto? Escríbenos',
-      '⚡ ALTEC Robótica y Electrónica – altecmec.com',
+      '⚡ ALTEC Robótica y Electrónica',
       product.codigo ? `Código: ${product.codigo}` : ''
     ].filter((l, i, arr) => l !== '' || (i > 0 && arr[i - 1] !== '')).join('\n').trim();
     this.mpPublicadoEl = this.leerPublicados()[product.id] || null;
