@@ -130,6 +130,49 @@ export class ThermalTicketService {
   <div class="center small">altecmec.com</div>`;
   }
 
+  /**
+   * Etiqueta de producto: el código lo más grande posible a lo ancho del papel
+   * (72 mm imprimibles) y debajo el logo ALTEC con el rayo.
+   */
+  async buildCodeLabel(codigo: string): Promise<string> {
+    const code = String(codigo || '').trim();
+    const logo = await this.getLogo();
+
+    // Ancho útil ≈ 68 mm en px CSS (96 dpi); se ajusta la letra para que el código lo llene
+    const anchoPx = 68 * 96 / 25.4;
+    const font = "900 100px 'Arial Black', Arial, Helvetica, sans-serif";
+    let size = 110;
+    const ctx = document.createElement('canvas').getContext('2d');
+    if (ctx && code) {
+      ctx.font = font;
+      const w = ctx.measureText(code).width;
+      if (w > 0) size = Math.min(150, Math.floor(100 * anchoPx / w));
+    }
+
+    return `<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Código ${this.esc(code)}</title>
+<style>
+  @page { size: 72mm 297mm; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; color: #000; }
+  body { width: 72mm; padding: 3mm 2mm 4mm; text-align: center; }
+  .code {
+    font-family: 'Arial Black', Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    font-size: ${size}px;
+    line-height: 1;
+    white-space: nowrap;
+    letter-spacing: 0;
+  }
+  .logo { display: block; width: 25mm; margin: 3mm auto 0; }
+  .brand { font-family: Arial, sans-serif; font-size: 11px; font-weight: 800; margin-top: 3mm; }
+</style></head>
+<body>
+  <div class="code">${this.esc(code)}</div>
+  ${logo ? `<img class="logo" src="${logo}" alt="ALTEC">` : '<div class="brand">⚡ ALTEC</div>'}
+</body></html>`;
+  }
+
   /** Logo de la barra (letras blancas) convertido a negro y recortado, para papel térmico. */
   getLogo(): Promise<string | null> {
     if (this.logo) return Promise.resolve(this.logo);

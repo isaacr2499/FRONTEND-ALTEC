@@ -713,3 +713,13 @@ th.sortable {
     box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
   }
 }
+
+// Botón imprimir código (al lado de editar)
+.btn-print-row {
+  margin-left: 0.4rem;
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.1);
+  color: #34D399;
+
+  &:hover { background: #10B981; border-color: #10B981; color: #fff; }
+}
