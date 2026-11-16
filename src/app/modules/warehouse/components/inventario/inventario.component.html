@@ -239,6 +239,11 @@
                         (click)="imprimirCodigo(product, $event)">
                         <i class="bi bi-printer"></i>
                       </button>
+                      <button type="button" class="btn-edit-row btn-mp-row" [class.mp-hecho]="publicadoMp(product)"
+                        [title]="publicadoMp(product) ? 'Ya publicado en Marketplace — volver a publicar' : 'Publicar en Facebook Marketplace'"
+                        (click)="abrirMarketplace(product, $event)">
+                        <i class="bi bi-shop"></i>
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -342,3 +347,79 @@
 <!-- ✏️ Ventana de producto: nuevo y edición -->
 <app-product-edit-modal #editModal (saved)="onProductSaved($event)" (deleted)="onProductDeleted($event)"
   (created)="getAllProducts()"></app-product-edit-modal>
+
+<!-- 🛒 Publicar en Facebook Marketplace -->
+<div class="mp-overlay" *ngIf="mpProduct" (click)="cerrarMarketplace()">
+  <div class="mp-box" (click)="$event.stopPropagation()">
+    <div class="mp-header">
+      <h5><i class="bi bi-shop"></i> Publicar en Marketplace</h5>
+      <button type="button" class="mp-close" (click)="cerrarMarketplace()" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="mp-body">
+      <div class="mp-producto">
+        <img *ngIf="mpProduct.foto && mpProduct.foto !== 'NOT-IMAGE'" [src]="mpProduct.foto" alt="">
+        <div>
+          <div class="mp-nombre">{{ mpProduct.descripcion }}</div>
+          <div class="mp-meta">
+            <span class="code-badge">{{ mpProduct.codigo }}</span>
+            <span [class.mp-sin-stock]="mpProduct.stock <= 0">Stock: {{ mpProduct.stock }}</span>
+          </div>
+          <div class="mp-aviso" *ngIf="mpProduct.stock <= 0"><i class="bi bi-exclamation-triangle"></i> Sin stock: mejor no publicarlo.</div>
+          <div class="mp-publicado" *ngIf="mpPublicadoEl">
+            <i class="bi bi-check-circle"></i> Publicado hace {{ diasDesde(mpPublicadoEl) }} día(s)
+            <span *ngIf="diasDesde(mpPublicadoEl) >= 7">— conviene renovarlo</span>
+          </div>
+        </div>
+      </div>
+
+      <ol class="mp-pasos">
+        <li>Pulsa <strong>Abrir Marketplace</strong> (el título queda copiado) y elige <em>Artículo en venta</em>.</li>
+        <li>Sube la foto, pega el título, el precio y la descripción.</li>
+        <li>Categoría <strong>Electrónica</strong>, estado <strong>Nuevo</strong>, y publica.</li>
+      </ol>
+
+      <div class="mp-campo">
+        <div class="mp-campo-head">
+          <label>Título <small>({{ mpTitulo.length }}/100)</small></label>
+          <button type="button" class="mp-copy" [class.ok]="mpCopiado === 'Título'" (click)="copiarMp(mpTitulo, 'Título')">
+            <i class="bi" [ngClass]="mpCopiado === 'Título' ? 'bi-check2' : 'bi-clipboard'"></i> Copiar
+          </button>
+        </div>
+        <input type="text" class="mp-input" [(ngModel)]="mpTitulo" [ngModelOptions]="{standalone: true}" maxlength="100">
+      </div>
+
+      <div class="mp-campo mp-campo-precio">
+        <div class="mp-campo-head">
+          <label>Precio (USD)</label>
+          <button type="button" class="mp-copy" [class.ok]="mpCopiado === 'Precio'" (click)="copiarMp(mpPrecio, 'Precio')">
+            <i class="bi" [ngClass]="mpCopiado === 'Precio' ? 'bi-check2' : 'bi-clipboard'"></i> Copiar
+          </button>
+        </div>
+        <input type="text" class="mp-input" [(ngModel)]="mpPrecio" [ngModelOptions]="{standalone: true}">
+      </div>
+
+      <div class="mp-campo">
+        <div class="mp-campo-head">
+          <label>Descripción</label>
+          <button type="button" class="mp-copy" [class.ok]="mpCopiado === 'Descripción'" (click)="copiarMp(mpDescripcion, 'Descripción')">
+            <i class="bi" [ngClass]="mpCopiado === 'Descripción' ? 'bi-check2' : 'bi-clipboard'"></i> Copiar
+          </button>
+        </div>
+        <textarea class="mp-input" rows="8" [(ngModel)]="mpDescripcion" [ngModelOptions]="{standalone: true}"></textarea>
+      </div>
+    </div>
+
+    <div class="mp-footer">
+      <button type="button" class="mp-btn mp-btn-foto" (click)="descargarFotoMp()">
+        <i class="bi bi-download"></i> Descargar foto
+      </button>
+      <button type="button" class="mp-btn mp-btn-fb" (click)="irAMarketplace()">
+        <i class="bi bi-facebook"></i> Abrir Marketplace
+      </button>
+      <button type="button" class="mp-btn mp-btn-ok" (click)="marcarPublicado()">
+        <i class="bi bi-check2-circle"></i> Ya lo publiqué
+      </button>
+    </div>
+  </div>
+</div>

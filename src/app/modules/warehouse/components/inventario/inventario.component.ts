@@ -67,6 +67,112 @@ export class InventarioComponent implements OnInit, OnDestroy {
     private thermal: ThermalTicketService
   ) { }
 
+  // ===================== 🛒 Publicar en Marketplace =====================
+  mpProduct: any = null;
+  mpTitulo = '';
+  mpDescripcion = '';
+  mpPrecio = '';
+  mpCopiado = '';
+  mpPublicadoEl: string | null = null;
+  readonly MP_URL = 'https://www.facebook.com/marketplace/create/item';
+  private readonly MP_KEY = 'altec-mp-publicados';
+
+  abrirMarketplace(product: any, event?: Event): void {
+    event?.stopPropagation();
+    this.mpProduct = product;
+    this.mpCopiado = '';
+    const nombre = String(product.descripcion || '').replace(/\s+/g, ' ').trim();
+    const sufijo = ' – Quito, envíos';
+    const max = 100 - sufijo.length;
+    this.mpTitulo = (nombre.length > max ? nombre.substring(0, max - 1).trim() + '…' : nombre) + sufijo;
+    this.mpPrecio = Number(product.pvp || 0).toFixed(2);
+    this.mpDescripcion = [
+      nombre,
+      '',
+      '✅ Nuevo, probado antes de entregar',
+      '📍 Quito – retiro en local y envíos a todo Ecuador',
+      '🚚 Compras sobre $20: cubrimos hasta $3 de envío',
+      '🛠️ ¿Necesitas ayuda con tu proyecto? Escríbenos',
+      '⚡ ALTEC Robótica y Electrónica – altecmec.com',
+      product.codigo ? `Código: ${product.codigo}` : ''
+    ].filter((l, i, arr) => l !== '' || (i > 0 && arr[i - 1] !== '')).join('\n').trim();
+    this.mpPublicadoEl = this.leerPublicados()[product.id] || null;
+  }
+
+  cerrarMarketplace(): void {
+    this.mpProduct = null;
+  }
+
+  async copiarMp(texto: string, que: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(texto);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = texto;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    this.mpCopiado = que;
+    Notiflix.Notify.success(`${que} copiado`);
+  }
+
+  /** Descarga la foto del producto; si el servidor de imágenes no lo permite, la abre en otra pestaña. */
+  async descargarFotoMp(): Promise<void> {
+    const url = this.mpProduct?.foto;
+    if (!url || url === 'NOT-IMAGE') {
+      Notiflix.Notify.warning('Este producto no tiene foto.');
+      return;
+    }
+    const nombre = `${this.mpProduct.codigo || 'producto'}.jpg`.replace(/[^\w.-]/g, '_');
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = nombre;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    } catch {
+      window.open(url, '_blank');
+      Notiflix.Notify.info('Se abrió la foto: guárdala con clic derecho → Guardar imagen.');
+    }
+  }
+
+  /** Abre Marketplace y deja el título copiado para pegarlo primero. */
+  async irAMarketplace(): Promise<void> {
+    await this.copiarMp(this.mpTitulo, 'Título');
+    window.open(this.MP_URL, '_blank');
+  }
+
+  marcarPublicado(): void {
+    if (!this.mpProduct) return;
+    const mapa = this.leerPublicados();
+    mapa[this.mpProduct.id] = new Date().toISOString();
+    try { localStorage.setItem(this.MP_KEY, JSON.stringify(mapa)); } catch { }
+    this.mpPublicadoEl = mapa[this.mpProduct.id];
+    Notiflix.Notify.success('Marcado como publicado en Marketplace');
+  }
+
+  publicadoMp(product: any): boolean {
+    return !!this.leerPublicados()[product?.id];
+  }
+
+  diasDesde(iso: string | null): number {
+    return iso ? Math.floor((Date.now() - new Date(iso).getTime()) / 86400000) : 0;
+  }
+
+  private leerPublicados(): Record<string, string> {
+    try {
+      return JSON.parse(localStorage.getItem(this.MP_KEY) || '{}');
+    } catch {
+      return {};
+    }
+  }
+
   /** Imprime en la térmica de 80 mm el código del producto en grande con el logo ALTEC debajo. */
   async imprimirCodigo(product: any, event?: Event): Promise<void> {
     event?.stopPropagation();
