@@ -9,6 +9,7 @@ import Notiflix from "notiflix";
 declare var bootstrap: any;
 import jsPDF from "jspdf";
 import { forkJoin } from 'rxjs';
+import { ThermalTicketService } from 'src/app/services/thermal-ticket.service';
 import { ProductEditModalComponent } from '../product-edit-modal/product-edit-modal.component';
 
 @Component({
@@ -62,8 +63,20 @@ export class InventarioComponent implements OnInit, OnDestroy {
   constructor(
     private productService: ProductService,
     private fb: UntypedFormBuilder,
-    private salesService: SalesService // Inyectar el servicio de ventas
+    private salesService: SalesService, // Inyectar el servicio de ventas
+    private thermal: ThermalTicketService
   ) { }
+
+  /** Imprime en la térmica de 80 mm el código del producto en grande con el logo ALTEC debajo. */
+  async imprimirCodigo(product: any, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    if (!product?.codigo) {
+      Notiflix.Notify.warning('Este producto no tiene código.');
+      return;
+    }
+    const html = await this.thermal.buildCodeLabel(product.codigo);
+    await this.thermal.print(html);
+  }
 
   ngOnInit(): void {
     this.formGroup = this.fb.group({
