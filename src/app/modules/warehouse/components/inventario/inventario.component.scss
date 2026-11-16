@@ -723,3 +723,182 @@ th.sortable {
 
   &:hover { background: #10B981; border-color: #10B981; color: #fff; }
 }
+
+// 🛒 Botón y ventana de Marketplace
+.btn-mp-row {
+  margin-left: 0.4rem;
+  border-color: rgba(24, 119, 242, 0.4);
+  background: rgba(24, 119, 242, 0.12);
+  color: #4B9BFF;
+  position: relative;
+
+  &:hover { background: #1877F2; border-color: #1877F2; color: #fff; }
+
+  &.mp-hecho::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #10B981;
+    border: 2px solid #0a1929;
+  }
+}
+
+.mp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.mp-box {
+  width: 100%;
+  max-width: 620px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #0f1e30 0%, #1a2332 100%);
+  border: 1px solid rgba(139, 80, 251, 0.3);
+  border-radius: 16px;
+  color: #fff;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.mp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid rgba(139, 80, 251, 0.2);
+
+  h5 { margin: 0; font-weight: 700; display: flex; gap: 0.5rem; align-items: center; i { color: #4B9BFF; } }
+}
+
+.mp-close {
+  background: none;
+  border: none;
+  color: #8B949E;
+  font-size: 1.1rem;
+  &:hover { color: #fff; }
+}
+
+.mp-body {
+  padding: 1rem 1.2rem;
+  overflow-y: auto;
+}
+
+.mp-producto {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  margin-bottom: 0.8rem;
+
+  img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #fff;
+    flex-shrink: 0;
+  }
+
+  .mp-nombre { font-weight: 700; line-height: 1.25; }
+  .mp-meta { display: flex; gap: 0.6rem; align-items: center; margin-top: 0.35rem; font-size: 0.85rem; color: #8B949E; }
+  .mp-sin-stock { color: #ff7675; font-weight: 700; }
+  .mp-aviso { color: #fdcb6e; font-size: 0.8rem; margin-top: 0.3rem; }
+  .mp-publicado { color: #34D399; font-size: 0.8rem; margin-top: 0.3rem; span { color: #fdcb6e; } }
+}
+
+.mp-pasos {
+  font-size: 0.8rem;
+  color: #8B949E;
+  background: rgba(24, 119, 242, 0.08);
+  border: 1px solid rgba(24, 119, 242, 0.25);
+  border-radius: 10px;
+  padding: 0.6rem 0.6rem 0.6rem 1.8rem;
+  margin-bottom: 0.9rem;
+
+  li { margin: 0.1rem 0; }
+  strong { color: #fff; }
+}
+
+.mp-campo {
+  margin-bottom: 0.75rem;
+
+  &.mp-campo-precio { max-width: 220px; }
+
+  .mp-campo-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.3rem;
+
+    label { color: #60A5FA; font-size: 0.8rem; font-weight: 600; small { color: #8B949E; font-weight: 400; } }
+  }
+}
+
+.mp-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(139, 80, 251, 0.3);
+  border-radius: 10px;
+  color: #fff;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.88rem;
+  resize: vertical;
+
+  &:focus { outline: none; border-color: #8B50FB; box-shadow: 0 0 12px rgba(139, 80, 251, 0.35); }
+}
+
+.mp-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  border: 1px solid rgba(139, 80, 251, 0.4);
+  background: rgba(139, 80, 251, 0.15);
+  color: #A78BFA;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &:hover { background: #8B50FB; color: #fff; }
+  &.ok { border-color: #10B981; background: rgba(16, 185, 129, 0.2); color: #34D399; }
+}
+
+.mp-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding: 0.8rem 1.2rem;
+  border-top: 1px solid rgba(139, 80, 251, 0.2);
+}
+
+.mp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  border: 2px solid transparent;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #fff;
+  transition: all 0.2s ease;
+
+  &:hover { transform: translateY(-2px); }
+
+  &.mp-btn-foto { border-color: rgba(139, 80, 251, 0.5); background: rgba(139, 80, 251, 0.15); }
+  &.mp-btn-fb   { background: #1877F2; }
+  &.mp-btn-ok   { border-color: #10B981; background: rgba(16, 185, 129, 0.15); color: #34D399; }
+}
